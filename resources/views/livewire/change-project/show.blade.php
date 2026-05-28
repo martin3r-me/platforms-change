@@ -20,7 +20,8 @@
     </x-slot>
 
     <x-slot name="sidebar">
-        <x-ui-sidebar-section title="Navigation">
+        <div class="px-4 py-4">
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-[color:var(--ui-muted)] mb-2">Navigation</h3>
             <nav class="space-y-1">
                 @foreach(['board' => 'Board', 'stakeholder' => 'Stakeholder', 'log' => 'Log', 'settings' => 'Einstellungen'] as $tab => $label)
                     <button wire:click="$set('activeTab', '{{ $tab }}')"
@@ -29,10 +30,11 @@
                     </button>
                 @endforeach
             </nav>
-        </x-ui-sidebar-section>
+        </div>
 
         {{-- Progress overview --}}
-        <x-ui-sidebar-section title="Fortschritt">
+        <div class="px-4 py-4 border-t border-[color:var(--ui-border)]">
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-[color:var(--ui-muted)] mb-2">Fortschritt</h3>
             @php
                 $completedPhases = $this->phases->where('status.value', 'completed')->count();
                 $totalPhases = $this->phases->count();
@@ -74,7 +76,7 @@
                     </div>
                 @endforeach
             </div>
-        </x-ui-sidebar-section>
+        </div>
     </x-slot>
 
     <x-slot name="main">

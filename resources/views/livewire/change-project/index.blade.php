@@ -25,9 +25,10 @@
     </x-slot>
 
     <x-slot name="sidebar">
-        <x-ui-sidebar-section title="Suche">
+        <div class="px-4 py-4">
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-[color:var(--ui-muted)] mb-2">Suche</h3>
             <x-ui-input-text wire:model.live.debounce.300ms="search" placeholder="Name, Code, Beschreibung..." size="sm" />
-        </x-ui-sidebar-section>
+        </div>
     </x-slot>
 
     <x-slot name="main">
