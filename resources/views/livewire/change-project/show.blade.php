@@ -110,6 +110,7 @@
                         @if($editingPhaseId === $phase->id)
                             <div class="space-y-2 border-t border-white/40 pt-3">
                                 <x-ui-input-select
+                                    name="phaseForm.status"
                                     wire:model="phaseForm.status"
                                     :options="['not_started' => 'Nicht gestartet', 'in_progress' => 'In Bearbeitung', 'completed' => 'Abgeschlossen', 'blocked' => 'Blockiert']"
                                     size="xs"
@@ -174,6 +175,7 @@
                     <h2 class="text-sm font-semibold text-[color:var(--ui-text)]">Alle Massnahmen</h2>
                     <div class="flex items-center gap-2">
                         <x-ui-input-select
+                            name="actionStatusFilter"
                             wire:model.live="actionStatusFilter"
                             :options="['open' => 'Offen', 'in_progress' => 'In Bearbeitung', 'done' => 'Erledigt', 'cancelled' => 'Abgebrochen']"
                             :nullable="true"
@@ -324,6 +326,7 @@
                 <h2 class="text-sm font-semibold text-[color:var(--ui-text)]">Change-Log</h2>
                 <div class="flex items-center gap-2">
                     <x-ui-input-select
+                        name="logTypeFilter"
                         wire:model.live="logTypeFilter"
                         :options="['note' => 'Notiz', 'milestone' => 'Meilenstein', 'decision' => 'Entscheidung', 'risk' => 'Risiko', 'blocker' => 'Blocker']"
                         :nullable="true"
@@ -331,6 +334,7 @@
                         size="xs"
                     />
                     <x-ui-input-select
+                        name="logPhaseFilter"
                         wire:model.live="logPhaseFilter"
                         :options="$this->phases->pluck('phase_number')->mapWithKeys(fn($p) => [$this->phases->firstWhere('phase_number', $p)->id => 'Phase ' . $p->value . ': ' . $p->shortLabel()])->toArray()"
                         :nullable="true"
@@ -406,6 +410,7 @@
 
                         <div class="grid grid-cols-2 gap-4">
                             <x-ui-input-select
+                                name="form.status"
                                 wire:model="form.status"
                                 label="Status"
                                 :options="['draft' => 'Entwurf', 'active' => 'Aktiv', 'paused' => 'Pausiert', 'completed' => 'Abgeschlossen', 'cancelled' => 'Abgebrochen']"
@@ -414,6 +419,7 @@
                         </div>
 
                         <x-ui-input-select
+                            name="form.owner_entity_id"
                             wire:model="form.owner_entity_id"
                             label="Owner (Organisation)"
                             :options="$this->availableEntities->pluck('name', 'id')->toArray()"
@@ -457,17 +463,20 @@
             <x-ui-input-text wire:model="stakeholderForm.role" label="Rolle" />
             <div class="grid grid-cols-2 gap-4">
                 <x-ui-input-select
+                    name="stakeholderForm.influence_level"
                     wire:model="stakeholderForm.influence_level"
                     label="Einfluss"
                     :options="['low' => 'Niedrig', 'medium' => 'Mittel', 'high' => 'Hoch', 'critical' => 'Kritisch']"
                 />
                 <x-ui-input-select
+                    name="stakeholderForm.support_level"
                     wire:model="stakeholderForm.support_level"
                     label="Unterstützung"
                     :options="['champion' => 'Champion', 'supporter' => 'Unterstützer', 'neutral' => 'Neutral', 'resistant' => 'Widerständig', 'blocker' => 'Blocker']"
                 />
             </div>
             <x-ui-input-select
+                name="stakeholderForm.entity_id"
                 wire:model="stakeholderForm.entity_id"
                 label="Organisation (optional)"
                 :options="$this->availableEntities->pluck('name', 'id')->toArray()"
@@ -490,6 +499,7 @@
             <x-ui-input-textarea wire:model="actionForm.description" label="Beschreibung" rows="3" />
             <div class="grid grid-cols-2 gap-4">
                 <x-ui-input-select
+                    name="actionForm.status"
                     wire:model="actionForm.status"
                     label="Status"
                     :options="['open' => 'Offen', 'in_progress' => 'In Bearbeitung', 'done' => 'Erledigt', 'cancelled' => 'Abgebrochen']"
@@ -498,6 +508,7 @@
             </div>
             <x-ui-input-text wire:model="actionForm.responsible" label="Verantwortlich" />
             <x-ui-input-select
+                name="actionForm.phase_id"
                 wire:model="actionForm.phase_id"
                 label="Phase (optional)"
                 :options="$this->phases->mapWithKeys(fn($p) => [$p->id => 'Phase ' . $p->phase_number->value . ': ' . $p->phase_number->shortLabel()])->toArray()"
@@ -517,12 +528,14 @@
         <form wire:submit="storeLog" class="space-y-4">
             <x-ui-input-text wire:model="logForm.title" label="Titel" required />
             <x-ui-input-select
+                name="logForm.type"
                 wire:model="logForm.type"
                 label="Typ"
                 :options="['note' => 'Notiz', 'milestone' => 'Meilenstein', 'decision' => 'Entscheidung', 'risk' => 'Risiko', 'blocker' => 'Blocker']"
             />
             <x-ui-input-textarea wire:model="logForm.content" label="Inhalt" rows="4" />
             <x-ui-input-select
+                name="logForm.phase_id"
                 wire:model="logForm.phase_id"
                 label="Phase (optional)"
                 :options="$this->phases->mapWithKeys(fn($p) => [$p->id => 'Phase ' . $p->phase_number->value . ': ' . $p->phase_number->shortLabel()])->toArray()"

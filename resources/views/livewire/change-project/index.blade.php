@@ -109,6 +109,7 @@
 
             <div class="grid grid-cols-2 gap-4">
                 <x-ui-input-select
+                    name="form.status"
                     wire:model="form.status"
                     label="Status"
                     :options="['draft' => 'Entwurf', 'active' => 'Aktiv', 'paused' => 'Pausiert', 'completed' => 'Abgeschlossen', 'cancelled' => 'Abgebrochen']"
@@ -117,6 +118,7 @@
             </div>
 
             <x-ui-input-select
+                name="form.owner_entity_id"
                 wire:model="form.owner_entity_id"
                 label="Owner (Organisation)"
                 :options="$this->availableEntities->pluck('name', 'id')->toArray()"
