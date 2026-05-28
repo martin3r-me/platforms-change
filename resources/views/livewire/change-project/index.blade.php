@@ -33,16 +33,15 @@
 
     <x-slot name="main">
         @if($this->projects->isEmpty())
-            <x-ui-empty-state
-                icon="heroicon-o-arrows-right-left"
-                title="Keine Change-Projekte"
-                description="Erstellen Sie ein neues Change-Projekt, um den Kotter 8-Stufen-Prozess zu starten."
-            >
+            <div class="flex flex-col items-center justify-center py-16 text-center">
+                @svg('heroicon-o-arrows-right-left', 'w-12 h-12 text-[color:var(--ui-muted)] mb-4')
+                <h3 class="text-sm font-semibold text-[color:var(--ui-text)] mb-1">Keine Change-Projekte</h3>
+                <p class="text-xs text-[color:var(--ui-secondary)] mb-4">Erstellen Sie ein neues Change-Projekt, um den Kotter 8-Stufen-Prozess zu starten.</p>
                 <x-ui-button variant="primary" size="sm" wire:click="create">
                     @svg('heroicon-o-plus', 'w-4 h-4')
                     Neues Projekt
                 </x-ui-button>
-            </x-ui-empty-state>
+            </div>
         @else
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach($this->projects as $project)
