@@ -32,6 +32,16 @@
     </x-slot>
 
     <x-slot name="main">
+        {{-- DEBUG --}}
+        <div class="p-4 mb-4 bg-yellow-100 border border-yellow-400 text-yellow-800 text-xs font-mono rounded">
+            <p><strong>DEBUG Index</strong></p>
+            <p>projects count: {{ $this->projects->count() }}</p>
+            <p>projects class: {{ get_class($this->projects) }}</p>
+            @foreach($this->projects as $dp)
+                <p>- {{ $dp->name }} (id={{ $dp->id }}, phases={{ $dp->phases->count() }}, phases_count={{ $dp->phases_count ?? 'NULL' }})</p>
+            @endforeach
+        </div>
+        {{-- /DEBUG --}}
         @if($this->projects->isEmpty())
             <div class="flex flex-col items-center justify-center py-16 text-center">
                 @svg('heroicon-o-arrows-right-left', 'w-12 h-12 text-[color:var(--ui-muted)] mb-4')

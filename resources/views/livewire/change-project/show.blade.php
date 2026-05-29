@@ -147,6 +147,23 @@
 
     <x-slot name="main">
 
+        {{-- DEBUG --}}
+        <div class="p-4 mb-4 bg-yellow-100 border border-yellow-400 text-yellow-800 text-xs font-mono rounded">
+            <p><strong>DEBUG Show</strong></p>
+            <p>activeTab: {{ $activeTab }}</p>
+            <p>phases count: {{ $this->phases->count() }}</p>
+            <p>actions count: {{ $this->actions->count() }}</p>
+            <p>logs count: {{ $this->logs->count() }}</p>
+            <p>openActionsCount: {{ $this->openActionsCount }}</p>
+            <p>momentum: {{ $this->projectMomentum }}</p>
+            @if($this->currentPhase)
+                <p>currentPhase: {{ $this->currentPhase->phase_number->shortLabel() }}</p>
+            @else
+                <p>currentPhase: NULL</p>
+            @endif
+        </div>
+        {{-- /DEBUG --}}
+
         {{-- ═══════════════════════════════════════════════════════════ --}}
         {{-- TAB: BOARD --}}
         {{-- ═══════════════════════════════════════════════════════════ --}}
