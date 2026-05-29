@@ -145,6 +145,57 @@ class Show extends Component
     }
 
     #[Computed]
+    public function openActionsCount(): int
+    {
+        return $this->project->actions()
+            ->whereNotIn('status', ['done', 'cancelled'])
+            ->count();
+    }
+
+    #[Computed]
+    public function totalLogsCount(): int
+    {
+        return $this->project->logs()->count();
+    }
+
+    #[Computed]
+    public function currentPhase(): ?ChangePhase
+    {
+        return $this->project->phases()
+            ->where('status', 'in_progress')
+            ->orderBy('phase_number')
+            ->first();
+    }
+
+    #[Computed]
+    public function projectMomentum(): string
+    {
+        $phases = $this->phases;
+
+        if ($phases->isEmpty()) {
+            return 'not_started';
+        }
+
+        if ($phases->contains(fn ($p) => $p->status->value === 'blocked')) {
+            return 'blocked';
+        }
+
+        if ($phases->every(fn ($p) => $p->status->value === 'completed')) {
+            return 'completed';
+        }
+
+        if ($phases->contains(fn ($p) => $p->status->value === 'in_progress')) {
+            return 'progressing';
+        }
+
+        if ($phases->contains(fn ($p) => $p->status->value === 'completed')) {
+            return 'active';
+        }
+
+        return 'not_started';
+    }
+
+    #[Computed]
     public function availableEntities()
     {
         return OrganizationEntity::where('team_id', Auth::user()->currentTeam->id)

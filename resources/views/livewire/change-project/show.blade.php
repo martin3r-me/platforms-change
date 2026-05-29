@@ -21,60 +21,126 @@
 
     <x-slot name="sidebar">
         <div class="px-4 py-4">
-            <h3 class="text-xs font-semibold uppercase tracking-wide text-[color:var(--ui-muted)] mb-2">Navigation</h3>
+            <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--ui-muted)] mb-2" style="font-family: 'JetBrains Mono', monospace;">Navigation</h3>
             <nav class="space-y-1">
-                @foreach(['board' => 'Board', 'stakeholder' => 'Stakeholder', 'log' => 'Log', 'settings' => 'Einstellungen'] as $tab => $label)
+                @php
+                    $tabConfig = [
+                        'board' => ['icon' => 'heroicon-o-view-columns', 'label' => 'Board'],
+                        'stakeholder' => ['icon' => 'heroicon-o-user-group', 'label' => 'Stakeholder'],
+                        'log' => ['icon' => 'heroicon-o-document-text', 'label' => 'Log'],
+                        'settings' => ['icon' => 'heroicon-o-cog-6-tooth', 'label' => 'Einstellungen'],
+                    ];
+                @endphp
+                @foreach($tabConfig as $tab => $cfg)
                     <button wire:click="$set('activeTab', '{{ $tab }}')"
-                            class="w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 {{ $activeTab === $tab ? 'bg-[rgb(var(--ui-primary-rgb))]/10 text-[rgb(var(--ui-primary-rgb))] font-medium' : 'text-[color:var(--ui-secondary)] hover:bg-white/60' }}">
-                        {{ $label }}
+                            class="w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 flex items-center gap-2 {{ $activeTab === $tab ? 'bg-[rgb(var(--ui-primary-rgb))]/10 text-[rgb(var(--ui-primary-rgb))] font-medium' : 'text-[color:var(--ui-secondary)] hover:bg-white/60' }}">
+                        @svg($cfg['icon'], 'w-4 h-4')
+                        {{ $cfg['label'] }}
                     </button>
                 @endforeach
             </nav>
         </div>
 
-        {{-- Progress overview --}}
+        {{-- SVG Circle Progress --}}
         <div class="px-4 py-4 border-t border-[color:var(--ui-border)]">
-            <h3 class="text-xs font-semibold uppercase tracking-wide text-[color:var(--ui-muted)] mb-2">Fortschritt</h3>
+            <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--ui-muted)] mb-3" style="font-family: 'JetBrains Mono', monospace;">Fortschritt</h3>
             @php
                 $completedPhases = $this->phases->where('status.value', 'completed')->count();
                 $totalPhases = $this->phases->count();
                 $progress = $totalPhases > 0 ? round(($completedPhases / $totalPhases) * 100) : 0;
+                $circumference = 2 * M_PI * 36;
+                $dashOffset = $circumference - ($circumference * $progress / 100);
             @endphp
-            <div class="space-y-2">
-                <div class="flex justify-between text-xs text-[color:var(--ui-secondary)]">
-                    <span>{{ $completedPhases }}/{{ $totalPhases }} Phasen</span>
-                    <span>{{ $progress }}%</span>
-                </div>
-                <div class="w-full bg-[color:var(--ui-bg-muted)] rounded-full h-2">
-                    <div class="bg-[rgb(var(--ui-success-rgb))] h-2 rounded-full transition-all duration-500"
-                         style="width: {{ $progress }}%"></div>
+            <div class="flex justify-center mb-3">
+                <div class="relative">
+                    <svg width="96" height="96" viewBox="0 0 96 96">
+                        <circle cx="48" cy="48" r="36" fill="none" stroke="currentColor" stroke-width="6" class="text-black/5" />
+                        <circle cx="48" cy="48" r="36" fill="none" stroke="currentColor" stroke-width="6"
+                                class="text-[rgb(var(--ui-primary-rgb))]"
+                                stroke-dasharray="{{ $circumference }}"
+                                stroke-dashoffset="{{ $dashOffset }}"
+                                stroke-linecap="round"
+                                transform="rotate(-90 48 48)"
+                                style="transition: stroke-dashoffset 0.5s ease;" />
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-lg font-bold text-[color:var(--ui-text)]" style="font-family: 'JetBrains Mono', monospace;">{{ $progress }}%</span>
+                    </div>
                 </div>
             </div>
+            <div class="text-center text-xs text-[color:var(--ui-secondary)] mb-4">
+                {{ $completedPhases }}/{{ $totalPhases }} Phasen
+            </div>
 
-            {{-- Phase status mini-list --}}
-            <div class="mt-3 space-y-1">
+            {{-- 8 Mini Bauhaus shapes --}}
+            <div class="space-y-1.5">
                 @foreach($this->phases as $phase)
-                    <div class="flex items-center gap-2 text-xs">
-                        @php
-                            $statusColor = match($phase->status->value) {
-                                'completed' => 'text-[rgb(var(--ui-success-rgb))]',
-                                'in_progress' => 'text-[rgb(var(--ui-warning-rgb))]',
-                                'blocked' => 'text-[rgb(var(--ui-danger-rgb))]',
-                                default => 'text-[color:var(--ui-secondary)]',
-                            };
-                            $statusIcon = match($phase->status->value) {
-                                'completed' => 'heroicon-s-check-circle',
-                                'in_progress' => 'heroicon-s-arrow-path',
-                                'blocked' => 'heroicon-s-no-symbol',
-                                default => 'heroicon-o-circle-stack',
-                            };
-                        @endphp
-                        @svg($statusIcon, 'w-3.5 h-3.5 ' . $statusColor)
-                        <span class="truncate {{ $phase->status->value === 'completed' ? 'line-through opacity-60' : '' }}">
+                    @php
+                        $phaseColor = $phase->phase_number->color();
+                        $isActive = in_array($phase->status->value, ['completed', 'in_progress']);
+                        $shapeColor = $isActive ? $phaseColor : '#D1D5DB';
+                    @endphp
+                    <div class="flex items-center gap-2.5 text-xs">
+                        <svg width="14" height="14" viewBox="0 0 16 16" style="color: {{ $shapeColor }};">
+                            @switch($phase->phase_number->shape())
+                                @case('triangle')
+                                    <polygon points="8,1 15,15 1,15" fill="currentColor"/>
+                                    @break
+                                @case('diamond')
+                                    <polygon points="8,1 15,8 8,15 1,8" fill="currentColor"/>
+                                    @break
+                                @case('circle')
+                                    <circle cx="8" cy="8" r="7" fill="currentColor"/>
+                                    @break
+                                @case('square')
+                                    <rect x="1" y="1" width="14" height="14" fill="currentColor"/>
+                                    @break
+                                @case('hexagon')
+                                    <polygon points="8,1 14,4 14,12 8,15 2,12 2,4" fill="currentColor"/>
+                                    @break
+                                @case('pentagon')
+                                    <polygon points="8,1 15,6 12,15 4,15 1,6" fill="currentColor"/>
+                                    @break
+                                @case('octagon')
+                                    <polygon points="5,1 11,1 15,5 15,11 11,15 5,15 1,11 1,5" fill="currentColor"/>
+                                    @break
+                            @endswitch
+                        </svg>
+                        <span class="truncate {{ $phase->status->value === 'completed' ? 'line-through opacity-50' : '' }} {{ $phase->status->value === 'in_progress' ? 'font-medium' : '' }}">
                             {{ $phase->phase_number->shortLabel() }}
                         </span>
+                        @if($phase->status->value === 'completed')
+                            <span class="ml-auto text-[10px]" style="color: {{ $phaseColor }};">&#10003;</span>
+                        @elseif($phase->status->value === 'in_progress')
+                            <span class="ml-auto w-1.5 h-1.5 rounded-full animate-pulse" style="background: {{ $phaseColor }};"></span>
+                        @endif
                     </div>
                 @endforeach
+            </div>
+        </div>
+
+        {{-- Key Metrics --}}
+        <div class="px-4 py-4 border-t border-[color:var(--ui-border)]">
+            <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--ui-muted)] mb-2" style="font-family: 'JetBrains Mono', monospace;">Kennzahlen</h3>
+            <div class="space-y-2 text-xs">
+                <div class="flex justify-between">
+                    <span class="text-[color:var(--ui-secondary)]">Massnahmen offen</span>
+                    <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $this->openActionsCount }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[color:var(--ui-secondary)]">Stakeholder</span>
+                    <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $this->stakeholders->count() }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[color:var(--ui-secondary)]">Log-Eintraege</span>
+                    <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $this->totalLogsCount }}</span>
+                </div>
+                @if($project->target_date)
+                    <div class="flex justify-between">
+                        <span class="text-[color:var(--ui-secondary)]">Zieldatum</span>
+                        <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $project->target_date->format('d.m.Y') }}</span>
+                    </div>
+                @endif
             </div>
         </div>
     </x-slot>
@@ -85,94 +151,71 @@
         {{-- TAB: BOARD --}}
         {{-- ═══════════════════════════════════════════════════════════ --}}
         @if($activeTab === 'board')
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                @foreach($this->phases as $phase)
-                    <div class="rounded-xl border border-white/40 bg-white/60 backdrop-blur-sm p-4 shadow-sm
-                                {{ $phase->status->value === 'completed' ? 'ring-2 ring-[rgb(var(--ui-success-rgb))]/20' : '' }}
-                                {{ $phase->status->value === 'blocked' ? 'ring-2 ring-[rgb(var(--ui-danger-rgb))]/20' : '' }}">
 
-                        {{-- Phase header --}}
-                        <div class="flex items-start justify-between gap-2 mb-3">
-                            <div>
-                                <span class="text-xs font-bold text-[color:var(--ui-secondary)]">Phase {{ $phase->phase_number->value }}</span>
-                                <h3 class="text-sm font-semibold text-[color:var(--ui-text)] leading-tight">
-                                    {{ $phase->phase_number->shortLabel() }}
-                                </h3>
-                            </div>
-                            <x-ui-badge :color="$phase->status->color()" size="xs">{{ $phase->status->label() }}</x-ui-badge>
-                        </div>
-
-                        <p class="text-xs text-[color:var(--ui-secondary)] mb-3 line-clamp-2">
-                            {{ $phase->phase_number->description() }}
-                        </p>
-
-                        {{-- Inline edit form --}}
-                        @if($editingPhaseId === $phase->id)
-                            <div class="space-y-2 border-t border-white/40 pt-3">
-                                <x-ui-input-select
-                                    name="phaseForm.status"
-                                    wire:model="phaseForm.status"
-                                    :options="['not_started' => 'Nicht gestartet', 'in_progress' => 'In Bearbeitung', 'completed' => 'Abgeschlossen', 'blocked' => 'Blockiert']"
-                                    size="xs"
-                                />
-                                <x-ui-input-text wire:model="phaseForm.responsible" placeholder="Verantwortlich" size="xs" />
-                                <x-ui-input-textarea wire:model="phaseForm.notes" placeholder="Notizen..." rows="2" size="xs" />
-                                <x-ui-input-textarea wire:model="phaseForm.evidence" placeholder="Nachweis/Dokumentation..." rows="2" size="xs" />
-                                <div class="flex gap-1">
-                                    <x-ui-button variant="primary" size="xs" wire:click="updatePhase">Speichern</x-ui-button>
-                                    <x-ui-button variant="secondary" size="xs" wire:click="cancelPhaseEdit">Abbrechen</x-ui-button>
-                                </div>
-                            </div>
-                        @else
-                            {{-- Phase details --}}
-                            @if($phase->responsible)
-                                <div class="text-xs text-[color:var(--ui-secondary)] mb-1">
-                                    @svg('heroicon-o-user', 'w-3 h-3 inline-block')
-                                    {{ $phase->responsible }}
-                                </div>
-                            @endif
-                            @if($phase->notes)
-                                <div class="text-xs text-[color:var(--ui-secondary)] mb-2 bg-white/40 rounded-lg p-2 line-clamp-3">
-                                    {{ $phase->notes }}
-                                </div>
-                            @endif
-
-                            {{-- Actions for this phase --}}
-                            @if($phase->actions_count > 0)
-                                <div class="text-xs text-[color:var(--ui-secondary)] mb-2">
-                                    @svg('heroicon-o-clipboard-document-list', 'w-3 h-3 inline-block')
-                                    {{ $phase->actions_count }} Massnahmen
-                                </div>
-                            @endif
-
-                            {{-- Quick actions --}}
-                            <div class="flex items-center gap-1 border-t border-white/40 pt-2 mt-2">
-                                <button wire:click="editPhase({{ $phase->id }})"
-                                        class="text-xs text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-primary-rgb))] transition-colors">
-                                    @svg('heroicon-o-pencil', 'w-3.5 h-3.5')
-                                </button>
-                                <button wire:click="createAction({{ $phase->id }})"
-                                        class="text-xs text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-primary-rgb))] transition-colors"
-                                        title="Massnahme hinzufügen">
-                                    @svg('heroicon-o-plus', 'w-3.5 h-3.5')
-                                </button>
-                                @if($phase->status->value !== 'completed')
-                                    <button wire:click="quickUpdatePhaseStatus({{ $phase->id }}, 'completed')"
-                                            class="ml-auto text-xs text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-success-rgb))] transition-colors"
-                                            title="Als abgeschlossen markieren">
-                                        @svg('heroicon-o-check-circle', 'w-3.5 h-3.5')
-                                    </button>
-                                @endif
-                            </div>
-                        @endif
+            {{-- Bauhaus Header --}}
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--ui-text)]" style="font-family: 'JetBrains Mono', monospace;">KOTTER 8-STEP MODEL</h2>
+                    {{-- 8 mini shapes as progress indicator --}}
+                    <div class="flex items-center gap-1">
+                        @foreach($this->phases as $phase)
+                            @php
+                                $miniColor = $phase->status->value === 'not_started' ? '#D1D5DB' : $phase->phase_number->color();
+                            @endphp
+                            <svg width="8" height="8" viewBox="0 0 16 16" style="color: {{ $miniColor }};">
+                                @switch($phase->phase_number->shape())
+                                    @case('triangle')
+                                        <polygon points="8,1 15,15 1,15" fill="currentColor"/>
+                                        @break
+                                    @case('diamond')
+                                        <polygon points="8,1 15,8 8,15 1,8" fill="currentColor"/>
+                                        @break
+                                    @case('circle')
+                                        <circle cx="8" cy="8" r="7" fill="currentColor"/>
+                                        @break
+                                    @case('square')
+                                        <rect x="1" y="1" width="14" height="14" fill="currentColor"/>
+                                        @break
+                                    @case('hexagon')
+                                        <polygon points="8,1 14,4 14,12 8,15 2,12 2,4" fill="currentColor"/>
+                                        @break
+                                    @case('pentagon')
+                                        <polygon points="8,1 15,6 12,15 4,15 1,6" fill="currentColor"/>
+                                        @break
+                                    @case('octagon')
+                                        <polygon points="5,1 11,1 15,5 15,11 11,15 5,15 1,11 1,5" fill="currentColor"/>
+                                        @break
+                                @endswitch
+                            </svg>
+                        @endforeach
                     </div>
+                </div>
+            </div>
+
+            {{-- Stage I: Voraussetzungen schaffen (Phases 1-4, warm colors) --}}
+            <div class="mb-2">
+                <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--ui-muted)] mb-3" style="font-family: 'JetBrains Mono', monospace;">I. Voraussetzungen schaffen</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                @foreach($this->phases->take(4) as $phase)
+                    @include('change::livewire.change-project._phase-card', ['phase' => $phase])
+                @endforeach
+            </div>
+
+            {{-- Stage II: Umsetzen & Verankern (Phases 5-8, cool colors) --}}
+            <div class="mb-2">
+                <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--ui-muted)] mb-3" style="font-family: 'JetBrains Mono', monospace;">II. Umsetzen & Verankern</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                @foreach($this->phases->skip(4) as $phase)
+                    @include('change::livewire.change-project._phase-card', ['phase' => $phase])
                 @endforeach
             </div>
 
             {{-- Actions overview below the board --}}
             <div class="mt-8">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-sm font-semibold text-[color:var(--ui-text)]">Alle Massnahmen</h2>
+                    <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-[color:var(--ui-text)]" style="font-family: 'JetBrains Mono', monospace;">Alle Massnahmen</h2>
                     <div class="flex items-center gap-2">
                         <x-ui-input-select
                             name="actionStatusFilter"
@@ -194,7 +237,11 @@
                 @else
                     <div class="space-y-2">
                         @foreach($this->actions as $action)
-                            <div class="flex items-center gap-3 rounded-lg border border-white/40 bg-white/60 backdrop-blur-sm px-4 py-3">
+                            @php
+                                $actionPhaseColor = $action->phase ? $action->phase->phase_number->color() : null;
+                            @endphp
+                            <div class="flex items-center gap-3 rounded-lg border border-black/5 bg-white/60 backdrop-blur-sm px-4 py-3 {{ $actionPhaseColor ? 'border-l-[3px]' : '' }}"
+                                 @if($actionPhaseColor) style="border-left-color: {{ $actionPhaseColor }};" @endif>
                                 <button wire:click="quickUpdateActionStatus({{ $action->id }}, '{{ $action->status->value === 'done' ? 'open' : 'done' }}')"
                                         class="flex-shrink-0 {{ $action->status->value === 'done' ? 'text-[rgb(var(--ui-success-rgb))]' : 'text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-success-rgb))]' }} transition-colors">
                                     @svg($action->status->value === 'done' ? 'heroicon-s-check-circle' : 'heroicon-o-circle-stack', 'w-5 h-5')
@@ -206,7 +253,34 @@
                                     </div>
                                     <div class="flex items-center gap-3 text-xs text-[color:var(--ui-secondary)] mt-0.5">
                                         @if($action->phase)
-                                            <span>Phase {{ $action->phase->phase_number->value }}: {{ $action->phase->phase_number->shortLabel() }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <svg width="8" height="8" viewBox="0 0 16 16" style="color: {{ $action->phase->phase_number->color() }};">
+                                                    @switch($action->phase->phase_number->shape())
+                                                        @case('triangle')
+                                                            <polygon points="8,1 15,15 1,15" fill="currentColor"/>
+                                                            @break
+                                                        @case('diamond')
+                                                            <polygon points="8,1 15,8 8,15 1,8" fill="currentColor"/>
+                                                            @break
+                                                        @case('circle')
+                                                            <circle cx="8" cy="8" r="7" fill="currentColor"/>
+                                                            @break
+                                                        @case('square')
+                                                            <rect x="1" y="1" width="14" height="14" fill="currentColor"/>
+                                                            @break
+                                                        @case('hexagon')
+                                                            <polygon points="8,1 14,4 14,12 8,15 2,12 2,4" fill="currentColor"/>
+                                                            @break
+                                                        @case('pentagon')
+                                                            <polygon points="8,1 15,6 12,15 4,15 1,6" fill="currentColor"/>
+                                                            @break
+                                                        @case('octagon')
+                                                            <polygon points="5,1 11,1 15,5 15,11 11,15 5,15 1,11 1,5" fill="currentColor"/>
+                                                            @break
+                                                    @endswitch
+                                                </svg>
+                                                {{ $action->phase->phase_number->shortLabel() }}
+                                            </span>
                                         @endif
                                         @if($action->responsible)
                                             <span>@svg('heroicon-o-user', 'w-3 h-3 inline-block') {{ $action->responsible }}</span>
@@ -238,28 +312,32 @@
         {{-- ═══════════════════════════════════════════════════════════ --}}
         @elseif($activeTab === 'stakeholder')
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-sm font-semibold text-[color:var(--ui-text)]">Stakeholder-Map</h2>
+                <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-[color:var(--ui-text)]" style="font-family: 'JetBrains Mono', monospace;">Stakeholder-Map</h2>
                 <x-ui-button variant="primary" size="xs" wire:click="createStakeholder">
                     @svg('heroicon-o-plus', 'w-3.5 h-3.5')
                     Stakeholder
                 </x-ui-button>
             </div>
 
-            {{-- Influence/Support Matrix --}}
+            {{-- Bauhaus Influence/Support Matrix --}}
             @if($this->stakeholders->isNotEmpty())
-                <div class="grid grid-cols-5 gap-1 mb-6 text-xs">
+                <div class="grid grid-cols-5 gap-px bg-black/5 rounded-lg overflow-hidden mb-6 text-xs">
                     {{-- Header row --}}
-                    <div class="font-medium text-center text-[color:var(--ui-secondary)] p-2"></div>
+                    <div class="bg-white/80 p-2"></div>
                     @foreach(\Platform\Change\Enums\StakeholderSupport::cases() as $support)
-                        <div class="font-medium text-center text-[color:var(--ui-secondary)] p-2 rounded-t-lg bg-white/30">
-                            {{ $support->label() }}
+                        <div class="bg-white/80 p-2 text-center">
+                            <span class="font-bold uppercase tracking-wider text-[10px] text-[color:var(--ui-secondary)]" style="font-family: 'JetBrains Mono', monospace;">
+                                {{ $support->label() }}
+                            </span>
                         </div>
                     @endforeach
 
                     {{-- Matrix rows --}}
                     @foreach(array_reverse(\Platform\Change\Enums\StakeholderInfluence::cases()) as $influence)
-                        <div class="font-medium text-right text-[color:var(--ui-secondary)] p-2 pr-3 bg-white/30 rounded-l-lg">
-                            {{ $influence->label() }}
+                        <div class="bg-white/80 p-2 flex items-center justify-end pr-3">
+                            <span class="font-bold uppercase tracking-wider text-[10px] text-[color:var(--ui-secondary)]" style="font-family: 'JetBrains Mono', monospace;">
+                                {{ $influence->label() }}
+                            </span>
                         </div>
                         @foreach(\Platform\Change\Enums\StakeholderSupport::cases() as $support)
                             @php
@@ -267,12 +345,22 @@
                                     ($s->influence_level->value ?? $s->influence_level) === $influence->value &&
                                     ($s->support_level->value ?? $s->support_level) === $support->value
                                 );
+                                // Zone coloring: red for high-influence+resistant/blocker, green for high-influence+champion/supporter
+                                $isHighInfluence = in_array($influence->value, ['high', 'critical']);
+                                $isResistant = in_array($support->value, ['resistant', 'blocker']);
+                                $isChampion = in_array($support->value, ['champion', 'supporter']);
+                                $zoneBg = 'bg-white/60';
+                                if ($isHighInfluence && $isResistant) {
+                                    $zoneBg = 'bg-red-50/80';
+                                } elseif ($isHighInfluence && $isChampion) {
+                                    $zoneBg = 'bg-green-50/80';
+                                }
                             @endphp
-                            <div class="bg-white/40 border border-white/60 rounded p-1 min-h-[3rem]">
+                            <div class="{{ $zoneBg }} p-1.5 min-h-[3rem]">
                                 @foreach($cellStakeholders as $s)
                                     <button wire:click="editStakeholder({{ $s->id }})"
                                             class="block w-full text-left px-1.5 py-0.5 rounded text-[10px] mb-0.5 truncate
-                                                   bg-[rgb(var(--ui-primary-rgb))]/10 text-[rgb(var(--ui-primary-rgb))] hover:bg-[rgb(var(--ui-primary-rgb))]/20 transition-colors">
+                                                   bg-black/5 hover:bg-black/10 transition-colors font-medium">
                                         {{ $s->name }}
                                     </button>
                                 @endforeach
@@ -288,7 +376,7 @@
             @else
                 <div class="space-y-2">
                     @foreach($this->stakeholders as $stakeholder)
-                        <div class="flex items-center gap-3 rounded-lg border border-white/40 bg-white/60 backdrop-blur-sm px-4 py-3">
+                        <div class="flex items-center gap-3 rounded-lg border border-black/5 bg-white/60 backdrop-blur-sm px-4 py-3">
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2">
                                     <span class="text-sm font-medium">{{ $stakeholder->name }}</span>
@@ -323,7 +411,7 @@
         {{-- ═══════════════════════════════════════════════════════════ --}}
         @elseif($activeTab === 'log')
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-sm font-semibold text-[color:var(--ui-text)]">Change-Log</h2>
+                <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-[color:var(--ui-text)]" style="font-family: 'JetBrains Mono', monospace;">Change-Log</h2>
                 <div class="flex items-center gap-2">
                     <x-ui-input-select
                         name="logTypeFilter"
@@ -349,16 +437,45 @@
             </div>
 
             @if($this->logs->isEmpty())
-                <p class="text-xs text-[color:var(--ui-secondary)]">Keine Log-Einträge vorhanden.</p>
+                <p class="text-xs text-[color:var(--ui-secondary)]">Keine Log-Eintraege vorhanden.</p>
             @else
                 <div class="space-y-3">
                     @foreach($this->logs as $log)
-                        <div class="relative pl-6 border-l-2 border-white/40 pb-4 last:pb-0">
-                            {{-- Timeline dot --}}
-                            <div class="absolute -left-[7px] top-0 w-3 h-3 rounded-full border-2 border-white
-                                        bg-[rgb(var(--ui-{{ $log->type->color() }}-rgb))]"></div>
+                        <div class="relative pl-6 border-l-2 border-black/10 pb-4 last:pb-0">
+                            {{-- Bauhaus timeline shape --}}
+                            <div class="absolute -left-[8px] top-0.5">
+                                @if($log->phase)
+                                    <svg width="14" height="14" viewBox="0 0 16 16" style="color: {{ $log->phase->phase_number->color() }};">
+                                        @switch($log->phase->phase_number->shape())
+                                            @case('triangle')
+                                                <polygon points="8,1 15,15 1,15" fill="currentColor"/>
+                                                @break
+                                            @case('diamond')
+                                                <polygon points="8,1 15,8 8,15 1,8" fill="currentColor"/>
+                                                @break
+                                            @case('circle')
+                                                <circle cx="8" cy="8" r="7" fill="currentColor"/>
+                                                @break
+                                            @case('square')
+                                                <rect x="1" y="1" width="14" height="14" fill="currentColor"/>
+                                                @break
+                                            @case('hexagon')
+                                                <polygon points="8,1 14,4 14,12 8,15 2,12 2,4" fill="currentColor"/>
+                                                @break
+                                            @case('pentagon')
+                                                <polygon points="8,1 15,6 12,15 4,15 1,6" fill="currentColor"/>
+                                                @break
+                                            @case('octagon')
+                                                <polygon points="5,1 11,1 15,5 15,11 11,15 5,15 1,11 1,5" fill="currentColor"/>
+                                                @break
+                                        @endswitch
+                                    </svg>
+                                @else
+                                    <div class="w-3 h-3 rounded-full border-2 border-white bg-[rgb(var(--ui-{{ $log->type->color() }}-rgb))]"></div>
+                                @endif
+                            </div>
 
-                            <div class="rounded-lg border border-white/40 bg-white/60 backdrop-blur-sm p-4">
+                            <div class="rounded-lg border border-black/5 bg-white/60 backdrop-blur-sm p-4">
                                 <div class="flex items-start justify-between gap-2 mb-1">
                                     <div class="flex items-center gap-2">
                                         @svg($log->type->icon(), 'w-4 h-4 text-[rgb(var(--ui-' . $log->type->color() . '-rgb))]')
@@ -380,12 +497,39 @@
                                 @endif
 
                                 <div class="flex items-center gap-3 text-[10px] text-[color:var(--ui-secondary)] mt-2">
-                                    <span>{{ $log->created_at->format('d.m.Y H:i') }}</span>
+                                    <span style="font-family: 'JetBrains Mono', monospace;">{{ $log->created_at->format('d.m.Y H:i') }}</span>
                                     @if($log->user)
                                         <span>{{ $log->user->name }}</span>
                                     @endif
                                     @if($log->phase)
-                                        <span>Phase {{ $log->phase->phase_number->value }}: {{ $log->phase->phase_number->shortLabel() }}</span>
+                                        <span class="flex items-center gap-1">
+                                            <svg width="8" height="8" viewBox="0 0 16 16" style="color: {{ $log->phase->phase_number->color() }};">
+                                                @switch($log->phase->phase_number->shape())
+                                                    @case('triangle')
+                                                        <polygon points="8,1 15,15 1,15" fill="currentColor"/>
+                                                        @break
+                                                    @case('diamond')
+                                                        <polygon points="8,1 15,8 8,15 1,8" fill="currentColor"/>
+                                                        @break
+                                                    @case('circle')
+                                                        <circle cx="8" cy="8" r="7" fill="currentColor"/>
+                                                        @break
+                                                    @case('square')
+                                                        <rect x="1" y="1" width="14" height="14" fill="currentColor"/>
+                                                        @break
+                                                    @case('hexagon')
+                                                        <polygon points="8,1 14,4 14,12 8,15 2,12 2,4" fill="currentColor"/>
+                                                        @break
+                                                    @case('pentagon')
+                                                        <polygon points="8,1 15,6 12,15 4,15 1,6" fill="currentColor"/>
+                                                        @break
+                                                    @case('octagon')
+                                                        <polygon points="5,1 11,1 15,5 15,11 11,15 5,15 1,11 1,5" fill="currentColor"/>
+                                                        @break
+                                                @endswitch
+                                            </svg>
+                                            {{ $log->phase->phase_number->shortLabel() }}
+                                        </span>
                                     @endif
                                 </div>
                             </div>
@@ -427,7 +571,7 @@
                             nullLabel="Kein Owner"
                         />
 
-                        <x-ui-input-textarea wire:model="form.urgency_statement" label="Warum ist die Veränderung nötig?" rows="3" />
+                        <x-ui-input-textarea wire:model="form.urgency_statement" label="Warum ist die Veraenderung noetig?" rows="3" />
                         <x-ui-input-textarea wire:model="form.vision_statement" label="Strategische Vision" rows="3" />
                     </div>
 
@@ -442,10 +586,10 @@
                 {{-- Danger zone --}}
                 <div class="rounded-xl border border-[rgb(var(--ui-danger-rgb))]/20 bg-[rgb(var(--ui-danger-rgb))]/5 p-6">
                     <h3 class="text-sm font-semibold text-[rgb(var(--ui-danger-rgb))] mb-2">Gefahrenzone</h3>
-                    <p class="text-xs text-[color:var(--ui-secondary)] mb-4">Das Löschen eines Projekts entfernt alle Phasen, Stakeholder, Massnahmen und Log-Einträge.</p>
-                    <x-ui-button variant="danger" size="sm" wire:click="delete" wire:confirm="Projekt und alle zugehörigen Daten wirklich löschen?">
+                    <p class="text-xs text-[color:var(--ui-secondary)] mb-4">Das Loeschen eines Projekts entfernt alle Phasen, Stakeholder, Massnahmen und Log-Eintraege.</p>
+                    <x-ui-button variant="danger" size="sm" wire:click="delete" wire:confirm="Projekt und alle zugehoerigen Daten wirklich loeschen?">
                         @svg('heroicon-o-trash', 'w-4 h-4')
-                        Projekt löschen
+                        Projekt loeschen
                     </x-ui-button>
                 </div>
             </div>
@@ -471,8 +615,8 @@
                 <x-ui-input-select
                     name="stakeholderForm.support_level"
                     wire:model="stakeholderForm.support_level"
-                    label="Unterstützung"
-                    :options="['champion' => 'Champion', 'supporter' => 'Unterstützer', 'neutral' => 'Neutral', 'resistant' => 'Widerständig', 'blocker' => 'Blocker']"
+                    label="Unterstuetzung"
+                    :options="['champion' => 'Champion', 'supporter' => 'Unterstuetzer', 'neutral' => 'Neutral', 'resistant' => 'Widerstaendig', 'blocker' => 'Blocker']"
                 />
             </div>
             <x-ui-input-select
@@ -504,7 +648,7 @@
                     label="Status"
                     :options="['open' => 'Offen', 'in_progress' => 'In Bearbeitung', 'done' => 'Erledigt', 'cancelled' => 'Abgebrochen']"
                 />
-                <x-ui-input-text wire:model="actionForm.due_date" label="Fällig am" type="date" />
+                <x-ui-input-text wire:model="actionForm.due_date" label="Faellig am" type="date" />
             </div>
             <x-ui-input-text wire:model="actionForm.responsible" label="Verantwortlich" />
             <x-ui-input-select

@@ -45,15 +45,21 @@
         @else
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach($this->projects as $project)
+                    @php
+                        // Determine the active phase for left border color
+                        $activePhase = $project->phases->firstWhere('status.value', 'in_progress');
+                        $borderColor = $activePhase ? $activePhase->phase_number->color() : '#D1D5DB';
+                    @endphp
                     <a href="{{ route('change.projects.show', $project) }}"
-                       class="group block rounded-xl border border-white/40 bg-white/60 backdrop-blur-sm p-5 shadow-sm hover:shadow-md hover:border-[rgb(var(--ui-primary-rgb))]/30 transition-all duration-200">
+                       class="group block rounded-xl border border-black/5 bg-white/60 backdrop-blur-sm p-5 shadow-sm hover:shadow-md hover:border-[rgb(var(--ui-primary-rgb))]/30 transition-all duration-200 border-l-[4px]"
+                       style="border-left-color: {{ $borderColor }};">
 
                         {{-- Header --}}
                         <div class="flex items-start justify-between gap-3 mb-3">
                             <div class="min-w-0">
                                 <h3 class="font-semibold text-sm text-[color:var(--ui-text)] truncate">{{ $project->name }}</h3>
                                 @if($project->code)
-                                    <span class="text-xs text-[color:var(--ui-secondary)]">{{ $project->code }}</span>
+                                    <span class="text-xs text-[color:var(--ui-secondary)]" style="font-family: 'JetBrains Mono', monospace;">{{ $project->code }}</span>
                                 @endif
                             </div>
                             <x-ui-badge :color="$project->status->color()" size="xs">{{ $project->status->label() }}</x-ui-badge>
@@ -63,20 +69,24 @@
                             <p class="text-xs text-[color:var(--ui-secondary)] line-clamp-2 mb-3">{{ $project->description }}</p>
                         @endif
 
-                        {{-- Progress bar --}}
-                        @php
-                            $progress = $project->phases_count > 0
-                                ? round(($project->completed_phases_count / $project->phases_count) * 100)
-                                : 0;
-                        @endphp
+                        {{-- Bauhaus 8-segment progress indicator --}}
                         <div class="mb-3">
-                            <div class="flex items-center justify-between text-xs text-[color:var(--ui-secondary)] mb-1">
-                                <span>Fortschritt</span>
-                                <span>{{ $project->completed_phases_count }}/{{ $project->phases_count }} Phasen</span>
+                            <div class="flex items-center justify-between text-xs mb-1.5">
+                                <span class="font-bold uppercase tracking-[0.1em] text-[10px] text-[color:var(--ui-secondary)]" style="font-family: 'JetBrains Mono', monospace;">Fortschritt</span>
+                                <span class="text-[color:var(--ui-secondary)]" style="font-family: 'JetBrains Mono', monospace;">{{ $project->completed_phases_count }}/{{ $project->phases_count }}</span>
                             </div>
-                            <div class="w-full bg-[color:var(--ui-bg-muted)] rounded-full h-1.5">
-                                <div class="bg-[rgb(var(--ui-success-rgb))] h-1.5 rounded-full transition-all duration-500"
-                                     style="width: {{ $progress }}%"></div>
+                            <div class="flex gap-0.5">
+                                @foreach($project->phases->sortBy('phase_number.value') as $phase)
+                                    @php
+                                        $segColor = match($phase->status->value) {
+                                            'completed' => $phase->phase_number->color(),
+                                            'in_progress' => $phase->phase_number->color() . '80',
+                                            default => '#E5E7EB',
+                                        };
+                                    @endphp
+                                    <div class="flex-1 h-1.5 rounded-full transition-all duration-500"
+                                         style="background: {{ $segColor }};"></div>
+                                @endforeach
                             </div>
                         </div>
 
@@ -84,7 +94,7 @@
                         <div class="flex items-center justify-between text-xs text-[color:var(--ui-secondary)]">
                             <span>{{ $project->actions_count }} Massnahmen</span>
                             @if($project->target_date)
-                                <span>Ziel: {{ $project->target_date->format('d.m.Y') }}</span>
+                                <span style="font-family: 'JetBrains Mono', monospace;">{{ $project->target_date->format('d.m.Y') }}</span>
                             @endif
                         </div>
 
@@ -126,7 +136,7 @@
                 nullLabel="Kein Owner"
             />
 
-            <x-ui-input-textarea wire:model="form.urgency_statement" label="Warum ist die Veränderung nötig?" rows="2" />
+            <x-ui-input-textarea wire:model="form.urgency_statement" label="Warum ist die Veraenderung noetig?" rows="2" />
             <x-ui-input-textarea wire:model="form.vision_statement" label="Strategische Vision" rows="2" />
 
             <div class="flex justify-end gap-2">

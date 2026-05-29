@@ -72,7 +72,7 @@ class Index extends Component
             $q->where('status', $this->statusFilter);
         }
 
-        return $q->with('ownerEntity')
+        return $q->with(['ownerEntity', 'phases'])
             ->orderBy('name')
             ->get();
     }
