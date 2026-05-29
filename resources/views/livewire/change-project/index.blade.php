@@ -32,6 +32,7 @@
     </x-slot>
 
     <x-slot name="main">
+        <h1 style="font-size:80px;color:red;font-weight:bold;text-align:center;padding:100px;">HALLO WELT</h1>
         {{-- DEBUG --}}
         <div class="p-4 mb-4 bg-yellow-100 border border-yellow-400 text-yellow-800 text-xs font-mono rounded">
             <p><strong>DEBUG Index</strong></p>
