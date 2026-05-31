@@ -35,6 +35,7 @@ class Show extends Component
         'responsible' => '',
         'notes' => '',
         'evidence' => '',
+        'blocked_reason' => '',
     ];
 
     // Stakeholder CRUD
@@ -257,10 +258,11 @@ class Show extends Component
 
         $this->editingPhaseId = $phase->id;
         $this->phaseForm = [
-            'status'      => $phase->status?->value ?? 'not_started',
-            'responsible' => $phase->responsible ?? '',
-            'notes'       => $phase->notes ?? '',
-            'evidence'    => $phase->evidence ?? '',
+            'status'         => $phase->status?->value ?? 'not_started',
+            'responsible'    => $phase->responsible ?? '',
+            'notes'          => $phase->notes ?? '',
+            'evidence'       => $phase->evidence ?? '',
+            'blocked_reason' => $phase->metadata['blocked_reason'] ?? '',
         ];
     }
 
@@ -269,11 +271,19 @@ class Show extends Component
         $phase = $this->project->phases()->find($this->editingPhaseId);
         if (! $phase) return;
 
+        $metadata = $phase->metadata ?? [];
+        if ($this->phaseForm['blocked_reason'] !== '') {
+            $metadata['blocked_reason'] = $this->phaseForm['blocked_reason'];
+        } else {
+            unset($metadata['blocked_reason']);
+        }
+
         $update = [
             'status'      => $this->phaseForm['status'],
             'responsible' => $this->phaseForm['responsible'] !== '' ? $this->phaseForm['responsible'] : null,
             'notes'       => $this->phaseForm['notes'] !== '' ? $this->phaseForm['notes'] : null,
             'evidence'    => $this->phaseForm['evidence'] !== '' ? $this->phaseForm['evidence'] : null,
+            'metadata'    => $metadata ?: null,
         ];
 
         if ($this->phaseForm['status'] === 'in_progress' && ! $phase->started_at) {

@@ -9,6 +9,24 @@
             ['label' => $project->name],
         ]">
             <x-slot name="left">
+                <div class="flex items-center gap-1 mr-4">
+                    @php
+                        $tabConfig = [
+                            'board' => ['icon' => 'heroicon-o-view-columns', 'label' => 'Board'],
+                            'stakeholder' => ['icon' => 'heroicon-o-user-group', 'label' => 'Stakeholder'],
+                            'log' => ['icon' => 'heroicon-o-document-text', 'label' => 'Log'],
+                            'settings' => ['icon' => 'heroicon-o-cog-6-tooth', 'label' => 'Einstellungen'],
+                        ];
+                    @endphp
+                    @foreach($tabConfig as $tab => $cfg)
+                        <button wire:click="$set('activeTab', '{{ $tab }}')"
+                                class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all duration-150
+                                       {{ $activeTab === $tab ? 'bg-[rgb(var(--ui-primary-rgb))]/10 text-[rgb(var(--ui-primary-rgb))]' : 'text-[color:var(--ui-secondary)] hover:bg-black/5' }}">
+                            @svg($cfg['icon'], 'w-3.5 h-3.5')
+                            {{ $cfg['label'] }}
+                        </button>
+                    @endforeach
+                </div>
                 @if($this->isDirty)
                     <x-ui-button variant="secondary" size="xs" wire:click="loadForm">Abbrechen</x-ui-button>
                     <x-ui-button variant="primary" size="xs" wire:click="save">Speichern</x-ui-button>
@@ -20,32 +38,10 @@
     </x-slot>
 
     <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Projekt" width="w-72" :defaultOpen="true" side="left">
+        <x-ui-page-sidebar title="Projekt" width="w-56" :defaultOpen="true" side="left">
             <div class="p-4 space-y-5">
-                {{-- Navigation --}}
-                <div>
-                    <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 mb-2" style="font-family: 'JetBrains Mono', monospace;">Navigation</h3>
-                    <nav class="space-y-1">
-                        @php
-                            $tabConfig = [
-                                'board' => ['icon' => 'heroicon-o-view-columns', 'label' => 'Board'],
-                                'stakeholder' => ['icon' => 'heroicon-o-user-group', 'label' => 'Stakeholder'],
-                                'log' => ['icon' => 'heroicon-o-document-text', 'label' => 'Log'],
-                                'settings' => ['icon' => 'heroicon-o-cog-6-tooth', 'label' => 'Einstellungen'],
-                            ];
-                        @endphp
-                        @foreach($tabConfig as $tab => $cfg)
-                            <button wire:click="$set('activeTab', '{{ $tab }}')"
-                                    class="w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 flex items-center gap-2 {{ $activeTab === $tab ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600 hover:bg-gray-100' }}">
-                                @svg($cfg['icon'], 'w-4 h-4')
-                                {{ $cfg['label'] }}
-                            </button>
-                        @endforeach
-                    </nav>
-                </div>
-
                 {{-- Progress --}}
-                <div class="border-t border-gray-200 pt-4">
+                <div>
                     <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 mb-3" style="font-family: 'JetBrains Mono', monospace;">Fortschritt</h3>
                     @php
                         $completedPhases = $this->phases->where('status.value', 'completed')->count();
@@ -106,7 +102,8 @@
                                             @break
                                     @endswitch
                                 </svg>
-                                <span class="truncate {{ $phase->status->value === 'completed' ? 'line-through opacity-50' : '' }} {{ $phase->status->value === 'in_progress' ? 'font-medium' : '' }}">
+                                <span class="truncate {{ $phase->status->value === 'completed' ? 'line-through opacity-50' : '' }} {{ $phase->status->value === 'in_progress' ? 'font-medium' : '' }}"
+                                      style="{{ $isActive ? 'color: ' . $phaseColor . ';' : '' }}">
                                     {{ $phase->phase_number->shortLabel() }}
                                 </span>
                                 @if($phase->status->value === 'completed')
@@ -258,8 +255,9 @@
                                 <div class="relative flex items-center justify-center w-[40px] h-[40px] {{ $isActive ? 'animate-pulse' : '' }}">
                                     @if($isActive)
                                         {{-- Glow ring for active phase --}}
-                                        <div class="absolute inset-[-4px] rounded-full opacity-30 animate-ping" style="background: {{ $jColor }}; animation-duration: 2s;"></div>
-                                        <div class="absolute inset-[-3px] rounded-full opacity-20" style="background: {{ $jColor }};"></div>
+                                        <div class="absolute inset-[-6px] rounded-full opacity-40 animate-ping" style="background: {{ $jColor }}; animation-duration: 2s;"></div>
+                                        <div class="absolute inset-[-4px] rounded-full opacity-25" style="background: {{ $jColor }};"></div>
+                                        <div class="absolute inset-[-2px] rounded-full opacity-15" style="box-shadow: 0 0 12px {{ $jColor }};"></div>
                                     @endif
                                     <svg width="40" height="40" viewBox="0 0 40 40" class="relative z-10">
                                         @switch($jShape)
@@ -300,7 +298,8 @@
                                 {{-- Phase number + short label --}}
                                 <span class="mt-1.5 text-[10px] font-bold {{ $isFilled ? 'text-[color:var(--ui-text)]' : 'text-[color:var(--ui-muted)]' }}"
                                       style="font-family: 'JetBrains Mono', monospace;">{{ $phase->phase_number->value }}</span>
-                                <span class="text-[9px] text-center leading-tight {{ $isFilled ? 'text-[color:var(--ui-secondary)]' : 'text-[color:var(--ui-muted)]' }} max-w-[60px] truncate">
+                                <span class="text-[9px] text-center leading-tight max-w-[60px] truncate {{ !$isFilled ? 'text-[color:var(--ui-muted)]' : '' }}"
+                                      @if($isFilled) style="color: {{ $jColor }};" @endif>
                                     {{ $phase->phase_number->shortLabel() }}
                                 </span>
                             </div>
