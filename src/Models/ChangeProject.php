@@ -44,7 +44,7 @@ class ChangeProject extends Model
                 $model->uuid = $uuid;
             }
             if (! $model->user_id) { $model->user_id = Auth::id(); }
-            if (! $model->team_id) { $model->team_id = Auth::user()?->currentTeamRelation?->id; }
+            if (! $model->team_id) { $model->team_id = Auth::user()?->currentTeamRelation?->getRootTeam()?->id; }
         });
     }
 

@@ -198,7 +198,7 @@ class Show extends Component
     #[Computed]
     public function availableEntities()
     {
-        return OrganizationEntity::where('team_id', Auth::user()->currentTeam->id)
+        return OrganizationEntity::where('team_id', Auth::user()->currentTeamRelation?->getRootTeam()?->id)
             ->orderBy('name')
             ->get();
     }
@@ -369,7 +369,7 @@ class Show extends Component
             $this->dispatch('toast', message: 'Stakeholder aktualisiert');
         } else {
             $this->project->stakeholders()->create(array_merge($payload, [
-                'team_id' => Auth::user()->currentTeam->id,
+                'team_id' => Auth::user()->currentTeamRelation?->getRootTeam()?->id,
                 'user_id' => Auth::id(),
             ]));
             $this->dispatch('toast', message: 'Stakeholder erstellt');
@@ -455,7 +455,7 @@ class Show extends Component
             $this->dispatch('toast', message: 'Massnahme aktualisiert');
         } else {
             $this->project->actions()->create(array_merge($payload, [
-                'team_id' => Auth::user()->currentTeam->id,
+                'team_id' => Auth::user()->currentTeamRelation?->getRootTeam()?->id,
                 'user_id' => Auth::id(),
             ]));
             $this->dispatch('toast', message: 'Massnahme erstellt');
@@ -536,7 +536,7 @@ class Show extends Component
             $this->dispatch('toast', message: 'Log-Eintrag aktualisiert');
         } else {
             $this->project->logs()->create(array_merge($payload, [
-                'team_id' => Auth::user()->currentTeam->id,
+                'team_id' => Auth::user()->currentTeamRelation?->getRootTeam()?->id,
                 'user_id' => Auth::id(),
             ]));
             $this->dispatch('toast', message: 'Log-Eintrag erstellt');

@@ -119,7 +119,7 @@
             @if($phase->actions_count > 0)
                 <div class="text-xs text-[color:var(--ui-secondary)] mb-2">
                     @svg('heroicon-o-clipboard-document-list', 'w-3 h-3 inline-block')
-                    {{ $phase->actions_count }} Massnahmen
+                    {{ $phase->actions_count }} Maßnahmen
                 </div>
             @endif
 
@@ -131,7 +131,7 @@
                 </button>
                 <button wire:click="createAction({{ $phase->id }})"
                         class="text-xs text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-primary-rgb))] transition-colors"
-                        title="Massnahme hinzufuegen">
+                        title="Maßnahme hinzufügen">
                     @svg('heroicon-o-plus', 'w-3.5 h-3.5')
                 </button>
                 @if(!$isCompleted)

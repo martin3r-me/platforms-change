@@ -57,7 +57,7 @@ class Index extends Component
             ->withCount(['phases as completed_phases_count' => fn ($pq) => $pq->where('status', 'completed')])
             ->withCount('phases')
             ->withCount('actions')
-            ->where('team_id', Auth::user()->currentTeam->id);
+            ->where('team_id', Auth::user()->currentTeamRelation?->getRootTeam()?->id);
 
         if ($this->search !== '') {
             $term = '%'.$this->search.'%';
@@ -80,7 +80,7 @@ class Index extends Component
     #[Computed]
     public function availableEntities()
     {
-        return OrganizationEntity::where('team_id', Auth::user()->currentTeam->id)
+        return OrganizationEntity::where('team_id', Auth::user()->currentTeamRelation?->getRootTeam()?->id)
             ->orderBy('name')
             ->get();
     }
@@ -96,7 +96,7 @@ class Index extends Component
 
     public function edit(int $id): void
     {
-        $project = ChangeProject::where('team_id', Auth::user()->currentTeam->id)->find($id);
+        $project = ChangeProject::where('team_id', Auth::user()->currentTeamRelation?->getRootTeam()?->id)->find($id);
         if (! $project) return;
 
         $this->resetValidation();
@@ -130,14 +130,14 @@ class Index extends Component
         ];
 
         if ($this->editingId) {
-            $project = ChangeProject::where('team_id', Auth::user()->currentTeam->id)->find($this->editingId);
+            $project = ChangeProject::where('team_id', Auth::user()->currentTeamRelation?->getRootTeam()?->id)->find($this->editingId);
             if ($project) {
                 $project->update($payload);
                 $this->dispatch('toast', message: 'Projekt aktualisiert');
             }
         } else {
             $project = ChangeProject::create(array_merge($payload, [
-                'team_id' => Auth::user()->currentTeam->id,
+                'team_id' => Auth::user()->currentTeamRelation?->getRootTeam()?->id,
                 'user_id' => Auth::id(),
             ]));
             $project->createDefaultPhases();
@@ -150,7 +150,7 @@ class Index extends Component
 
     public function delete(int $id): void
     {
-        $project = ChangeProject::where('team_id', Auth::user()->currentTeam->id)->find($id);
+        $project = ChangeProject::where('team_id', Auth::user()->currentTeamRelation?->getRootTeam()?->id)->find($id);
         if (! $project) return;
 
         $project->delete();

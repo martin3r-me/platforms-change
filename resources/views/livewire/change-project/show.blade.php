@@ -124,7 +124,7 @@
             <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--ui-muted)] mb-2" style="font-family: 'JetBrains Mono', monospace;">Kennzahlen</h3>
             <div class="space-y-2 text-xs">
                 <div class="flex justify-between">
-                    <span class="text-[color:var(--ui-secondary)]">Massnahmen offen</span>
+                    <span class="text-[color:var(--ui-secondary)]">Maßnahmen offen</span>
                     <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $this->openActionsCount }}</span>
                 </div>
                 <div class="flex justify-between">
@@ -132,7 +132,7 @@
                     <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $this->stakeholders->count() }}</span>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-[color:var(--ui-secondary)]">Log-Eintraege</span>
+                    <span class="text-[color:var(--ui-secondary)]">Log-Einträge</span>
                     <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $this->totalLogsCount }}</span>
                 </div>
                 @if($project->target_date)
@@ -146,23 +146,6 @@
     </x-slot>
 
     <x-slot name="main">
-
-        {{-- DEBUG --}}
-        <div class="p-4 mb-4 bg-yellow-100 border border-yellow-400 text-yellow-800 text-xs font-mono rounded">
-            <p><strong>DEBUG Show</strong></p>
-            <p>activeTab: {{ $activeTab }}</p>
-            <p>phases count: {{ $this->phases->count() }}</p>
-            <p>actions count: {{ $this->actions->count() }}</p>
-            <p>logs count: {{ $this->logs->count() }}</p>
-            <p>openActionsCount: {{ $this->openActionsCount }}</p>
-            <p>momentum: {{ $this->projectMomentum }}</p>
-            @if($this->currentPhase)
-                <p>currentPhase: {{ $this->currentPhase->phase_number->shortLabel() }}</p>
-            @else
-                <p>currentPhase: NULL</p>
-            @endif
-        </div>
-        {{-- /DEBUG --}}
 
         {{-- ═══════════════════════════════════════════════════════════ --}}
         {{-- TAB: BOARD --}}
@@ -232,7 +215,7 @@
             {{-- Actions overview below the board --}}
             <div class="mt-8">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-[color:var(--ui-text)]" style="font-family: 'JetBrains Mono', monospace;">Alle Massnahmen</h2>
+                    <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-[color:var(--ui-text)]" style="font-family: 'JetBrains Mono', monospace;">Alle Maßnahmen</h2>
                     <div class="flex items-center gap-2">
                         <x-ui-input-select
                             name="actionStatusFilter"
@@ -250,7 +233,7 @@
                 </div>
 
                 @if($this->actions->isEmpty())
-                    <p class="text-xs text-[color:var(--ui-secondary)]">Keine Massnahmen vorhanden.</p>
+                    <p class="text-xs text-[color:var(--ui-secondary)]">Keine Maßnahmen vorhanden.</p>
                 @else
                     <div class="space-y-2">
                         @foreach($this->actions as $action)
@@ -454,7 +437,7 @@
             </div>
 
             @if($this->logs->isEmpty())
-                <p class="text-xs text-[color:var(--ui-secondary)]">Keine Log-Eintraege vorhanden.</p>
+                <p class="text-xs text-[color:var(--ui-secondary)]">Keine Log-Einträge vorhanden.</p>
             @else
                 <div class="space-y-3">
                     @foreach($this->logs as $log)
@@ -588,7 +571,7 @@
                             nullLabel="Kein Owner"
                         />
 
-                        <x-ui-input-textarea wire:model="form.urgency_statement" label="Warum ist die Veraenderung noetig?" rows="3" />
+                        <x-ui-input-textarea wire:model="form.urgency_statement" label="Warum ist die Veränderung nötig?" rows="3" />
                         <x-ui-input-textarea wire:model="form.vision_statement" label="Strategische Vision" rows="3" />
                     </div>
 
@@ -603,10 +586,10 @@
                 {{-- Danger zone --}}
                 <div class="rounded-xl border border-[rgb(var(--ui-danger-rgb))]/20 bg-[rgb(var(--ui-danger-rgb))]/5 p-6">
                     <h3 class="text-sm font-semibold text-[rgb(var(--ui-danger-rgb))] mb-2">Gefahrenzone</h3>
-                    <p class="text-xs text-[color:var(--ui-secondary)] mb-4">Das Loeschen eines Projekts entfernt alle Phasen, Stakeholder, Massnahmen und Log-Eintraege.</p>
-                    <x-ui-button variant="danger" size="sm" wire:click="delete" wire:confirm="Projekt und alle zugehoerigen Daten wirklich loeschen?">
+                    <p class="text-xs text-[color:var(--ui-secondary)] mb-4">Das Löschen eines Projekts entfernt alle Phasen, Stakeholder, Maßnahmen und Log-Einträge.</p>
+                    <x-ui-button variant="danger" size="sm" wire:click="delete" wire:confirm="Projekt und alle zugehoerigen Daten wirklich löschen?">
                         @svg('heroicon-o-trash', 'w-4 h-4')
-                        Projekt loeschen
+                        Projekt löschen
                     </x-ui-button>
                 </div>
             </div>
@@ -632,8 +615,8 @@
                 <x-ui-input-select
                     name="stakeholderForm.support_level"
                     wire:model="stakeholderForm.support_level"
-                    label="Unterstuetzung"
-                    :options="['champion' => 'Champion', 'supporter' => 'Unterstuetzer', 'neutral' => 'Neutral', 'resistant' => 'Widerstaendig', 'blocker' => 'Blocker']"
+                    label="Unterstützung"
+                    :options="['champion' => 'Champion', 'supporter' => 'Unterstützer', 'neutral' => 'Neutral', 'resistant' => 'Widerständig', 'blocker' => 'Blocker']"
                 />
             </div>
             <x-ui-input-select
@@ -665,7 +648,7 @@
                     label="Status"
                     :options="['open' => 'Offen', 'in_progress' => 'In Bearbeitung', 'done' => 'Erledigt', 'cancelled' => 'Abgebrochen']"
                 />
-                <x-ui-input-text wire:model="actionForm.due_date" label="Faellig am" type="date" />
+                <x-ui-input-text wire:model="actionForm.due_date" label="Fällig am" type="date" />
             </div>
             <x-ui-input-text wire:model="actionForm.responsible" label="Verantwortlich" />
             <x-ui-input-select

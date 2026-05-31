@@ -92,7 +92,7 @@
 
                         {{-- Footer --}}
                         <div class="flex items-center justify-between text-xs text-[color:var(--ui-secondary)]">
-                            <span>{{ $project->actions_count }} Massnahmen</span>
+                            <span>{{ $project->actions_count }} Maßnahmen</span>
                             @if($project->target_date)
                                 <span style="font-family: 'JetBrains Mono', monospace;">{{ $project->target_date->format('d.m.Y') }}</span>
                             @endif
@@ -136,7 +136,7 @@
                 nullLabel="Kein Owner"
             />
 
-            <x-ui-input-textarea wire:model="form.urgency_statement" label="Warum ist die Veraenderung noetig?" rows="2" />
+            <x-ui-input-textarea wire:model="form.urgency_statement" label="Warum ist die Veränderung nötig?" rows="2" />
             <x-ui-input-textarea wire:model="form.vision_statement" label="Strategische Vision" rows="2" />
 
             <div class="flex justify-end gap-2">
