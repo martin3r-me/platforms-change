@@ -158,7 +158,13 @@
                         title="Maßnahme hinzufügen">
                     @svg('heroicon-o-plus', 'w-3.5 h-3.5')
                 </button>
-                @if(!$isCompleted)
+                @if($isCompleted)
+                    <button wire:click="quickUpdatePhaseStatus({{ $phase->id }}, 'not_started')"
+                            class="ml-auto text-xs text-[rgb(var(--ui-success-rgb))] hover:text-[color:var(--ui-secondary)] transition-colors"
+                            title="Zurücksetzen auf nicht gestartet">
+                        @svg('heroicon-s-check-circle', 'w-3.5 h-3.5')
+                    </button>
+                @else
                     <button wire:click="quickUpdatePhaseStatus({{ $phase->id }}, 'completed')"
                             class="ml-auto text-xs text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-success-rgb))] transition-colors"
                             title="Als abgeschlossen markieren">

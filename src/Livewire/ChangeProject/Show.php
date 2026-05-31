@@ -315,6 +315,10 @@ class Show extends Component
         $update = ['status' => $status];
         if ($status === 'in_progress' && ! $phase->started_at) $update['started_at'] = now();
         if ($status === 'completed' && ! $phase->completed_at) $update['completed_at'] = now();
+        if ($status === 'not_started') {
+            $update['started_at'] = null;
+            $update['completed_at'] = null;
+        }
         if ($status !== 'completed') $update['completed_at'] = null;
 
         $phase->update($update);
