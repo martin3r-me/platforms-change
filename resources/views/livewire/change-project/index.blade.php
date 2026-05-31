@@ -1,6 +1,6 @@
 <x-ui-page>
     <x-slot name="navbar">
-        <x-ui-page-navbar title="" />
+        <x-ui-page-navbar title="Change-Projekte" />
     </x-slot>
 
     <x-slot name="actionbar">
@@ -25,18 +25,20 @@
     </x-slot>
 
     <x-slot name="sidebar">
-        <div class="px-4 py-4">
-            <h3 class="text-xs font-semibold uppercase tracking-wide text-[color:var(--ui-muted)] mb-2">Suche</h3>
-            <x-ui-input-text wire:model.live.debounce.300ms="search" placeholder="Name, Code, Beschreibung..." size="sm" />
-        </div>
+        <x-ui-page-sidebar title="Suche" width="w-72" :defaultOpen="true" side="left">
+            <div class="p-4">
+                <x-ui-input-text wire:model.live.debounce.300ms="search" placeholder="Name, Code, Beschreibung..." size="sm" />
+            </div>
+        </x-ui-page-sidebar>
     </x-slot>
 
-    <x-slot name="main">
+    {{-- Main content (default slot) --}}
+    <x-ui-page-container>
         @if($this->projects->isEmpty())
             <div class="flex flex-col items-center justify-center py-16 text-center">
-                @svg('heroicon-o-arrows-right-left', 'w-12 h-12 text-[color:var(--ui-muted)] mb-4')
-                <h3 class="text-sm font-semibold text-[color:var(--ui-text)] mb-1">Keine Change-Projekte</h3>
-                <p class="text-xs text-[color:var(--ui-secondary)] mb-4">Erstellen Sie ein neues Change-Projekt, um den Kotter 8-Stufen-Prozess zu starten.</p>
+                @svg('heroicon-o-arrows-right-left', 'w-12 h-12 text-gray-300 mb-4')
+                <h3 class="text-sm font-semibold text-gray-900 mb-1">Keine Change-Projekte</h3>
+                <p class="text-xs text-gray-500 mb-4">Erstellen Sie ein neues Change-Projekt, um den Kotter 8-Stufen-Prozess zu starten.</p>
                 <x-ui-button variant="primary" size="sm" wire:click="create">
                     @svg('heroicon-o-plus', 'w-4 h-4')
                     Neues Projekt
@@ -46,32 +48,30 @@
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach($this->projects as $project)
                     @php
-                        // Determine the active phase for left border color
                         $activePhase = $project->phases->firstWhere('status.value', 'in_progress');
                         $borderColor = $activePhase ? $activePhase->phase_number->color() : '#D1D5DB';
                     @endphp
                     <a href="{{ route('change.projects.show', $project) }}"
-                       class="group block rounded-xl border border-black/5 bg-white/60 backdrop-blur-sm p-5 shadow-sm hover:shadow-md hover:border-[rgb(var(--ui-primary-rgb))]/30 transition-all duration-200 border-l-[4px]"
+                       class="group block rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all duration-200 border-l-[4px]"
                        style="border-left-color: {{ $borderColor }};">
 
                         {{-- Header --}}
                         <div class="flex items-start justify-between gap-3 mb-3">
                             <div class="min-w-0">
-                                <h3 class="font-semibold text-sm text-[color:var(--ui-text)] truncate">{{ $project->name }}</h3>
+                                <h3 class="font-semibold text-sm text-gray-900 truncate">{{ $project->name }}</h3>
                                 @if($project->code)
-                                    <span class="text-xs text-[color:var(--ui-secondary)]" style="font-family: 'JetBrains Mono', monospace;">{{ $project->code }}</span>
+                                    <span class="text-xs text-gray-500" style="font-family: 'JetBrains Mono', monospace;">{{ $project->code }}</span>
                                 @endif
                             </div>
                             <x-ui-badge :color="$project->status->color()" size="xs">{{ $project->status->label() }}</x-ui-badge>
                         </div>
 
                         @if($project->description)
-                            <p class="text-xs text-[color:var(--ui-secondary)] line-clamp-2 mb-3">{{ $project->description }}</p>
+                            <p class="text-xs text-gray-500 line-clamp-2 mb-3">{{ $project->description }}</p>
                         @endif
 
-                        {{-- Bauhaus 8-segment progress indicator --}}
+                        {{-- Mini Bauhaus Shapes + Progress --}}
                         <div class="mb-3">
-                            {{-- Mini Bauhaus Shapes Row --}}
                             <div class="flex items-center gap-1 mb-2">
                                 @foreach($project->phases->sortBy('phase_number.value') as $phase)
                                     @php
@@ -111,10 +111,9 @@
                                         @endif
                                     </div>
                                 @endforeach
-                                <span class="ml-auto text-[color:var(--ui-secondary)] text-[10px]" style="font-family: 'JetBrains Mono', monospace;">{{ $project->completed_phases_count }}/{{ $project->phases_count }}</span>
+                                <span class="ml-auto text-gray-500 text-[10px]" style="font-family: 'JetBrains Mono', monospace;">{{ $project->completed_phases_count }}/{{ $project->phases_count }}</span>
                             </div>
 
-                            {{-- Segment progress bar --}}
                             <div class="flex gap-0.5">
                                 @foreach($project->phases->sortBy('phase_number.value') as $phase)
                                     @php
@@ -131,7 +130,7 @@
                         </div>
 
                         {{-- Footer --}}
-                        <div class="flex items-center justify-between text-xs text-[color:var(--ui-secondary)]">
+                        <div class="flex items-center justify-between text-xs text-gray-500">
                             <span>{{ $project->actions_count }} Maßnahmen</span>
                             @if($project->target_date)
                                 <span style="font-family: 'JetBrains Mono', monospace;">{{ $project->target_date->format('d.m.Y') }}</span>
@@ -139,7 +138,7 @@
                         </div>
 
                         @if($project->ownerEntity)
-                            <div class="mt-2 text-xs text-[color:var(--ui-secondary)]">
+                            <div class="mt-2 text-xs text-gray-500">
                                 @svg('heroicon-o-user-circle', 'w-3.5 h-3.5 inline-block')
                                 {{ $project->ownerEntity->name }}
                             </div>
@@ -148,7 +147,7 @@
                 @endforeach
             </div>
         @endif
-    </x-slot>
+    </x-ui-page-container>
 
     {{-- Create/Edit Modal --}}
     <x-ui-modal wire:model="modalShow" :title="$editingId ? 'Projekt bearbeiten' : 'Neues Change-Projekt'">

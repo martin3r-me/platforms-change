@@ -20,132 +20,135 @@
     </x-slot>
 
     <x-slot name="sidebar">
-        <div class="px-4 py-4">
-            <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--ui-muted)] mb-2" style="font-family: 'JetBrains Mono', monospace;">Navigation</h3>
-            <nav class="space-y-1">
-                @php
-                    $tabConfig = [
-                        'board' => ['icon' => 'heroicon-o-view-columns', 'label' => 'Board'],
-                        'stakeholder' => ['icon' => 'heroicon-o-user-group', 'label' => 'Stakeholder'],
-                        'log' => ['icon' => 'heroicon-o-document-text', 'label' => 'Log'],
-                        'settings' => ['icon' => 'heroicon-o-cog-6-tooth', 'label' => 'Einstellungen'],
-                    ];
-                @endphp
-                @foreach($tabConfig as $tab => $cfg)
-                    <button wire:click="$set('activeTab', '{{ $tab }}')"
-                            class="w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 flex items-center gap-2 {{ $activeTab === $tab ? 'bg-[rgb(var(--ui-primary-rgb))]/10 text-[rgb(var(--ui-primary-rgb))] font-medium' : 'text-[color:var(--ui-secondary)] hover:bg-white/60' }}">
-                        @svg($cfg['icon'], 'w-4 h-4')
-                        {{ $cfg['label'] }}
-                    </button>
-                @endforeach
-            </nav>
-        </div>
+        <x-ui-page-sidebar title="Projekt" width="w-72" :defaultOpen="true" side="left">
+            <div class="p-4 space-y-5">
+                {{-- Navigation --}}
+                <div>
+                    <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 mb-2" style="font-family: 'JetBrains Mono', monospace;">Navigation</h3>
+                    <nav class="space-y-1">
+                        @php
+                            $tabConfig = [
+                                'board' => ['icon' => 'heroicon-o-view-columns', 'label' => 'Board'],
+                                'stakeholder' => ['icon' => 'heroicon-o-user-group', 'label' => 'Stakeholder'],
+                                'log' => ['icon' => 'heroicon-o-document-text', 'label' => 'Log'],
+                                'settings' => ['icon' => 'heroicon-o-cog-6-tooth', 'label' => 'Einstellungen'],
+                            ];
+                        @endphp
+                        @foreach($tabConfig as $tab => $cfg)
+                            <button wire:click="$set('activeTab', '{{ $tab }}')"
+                                    class="w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 flex items-center gap-2 {{ $activeTab === $tab ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600 hover:bg-gray-100' }}">
+                                @svg($cfg['icon'], 'w-4 h-4')
+                                {{ $cfg['label'] }}
+                            </button>
+                        @endforeach
+                    </nav>
+                </div>
 
-        {{-- SVG Circle Progress --}}
-        <div class="px-4 py-4 border-t border-[color:var(--ui-border)]">
-            <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--ui-muted)] mb-3" style="font-family: 'JetBrains Mono', monospace;">Fortschritt</h3>
-            @php
-                $completedPhases = $this->phases->where('status.value', 'completed')->count();
-                $totalPhases = $this->phases->count();
-                $progress = $totalPhases > 0 ? round(($completedPhases / $totalPhases) * 100) : 0;
-                $circumference = 2 * M_PI * 36;
-                $dashOffset = $circumference - ($circumference * $progress / 100);
-            @endphp
-            <div class="flex justify-center mb-3">
-                <div class="relative">
-                    <svg width="96" height="96" viewBox="0 0 96 96">
-                        <circle cx="48" cy="48" r="36" fill="none" stroke="currentColor" stroke-width="6" class="text-black/5" />
-                        <circle cx="48" cy="48" r="36" fill="none" stroke="currentColor" stroke-width="6"
-                                class="text-[rgb(var(--ui-primary-rgb))]"
-                                stroke-dasharray="{{ $circumference }}"
-                                stroke-dashoffset="{{ $dashOffset }}"
-                                stroke-linecap="round"
-                                transform="rotate(-90 48 48)"
-                                style="transition: stroke-dashoffset 0.5s ease;" />
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-lg font-bold text-[color:var(--ui-text)]" style="font-family: 'JetBrains Mono', monospace;">{{ $progress }}%</span>
+                {{-- Progress --}}
+                <div class="border-t border-gray-200 pt-4">
+                    <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 mb-3" style="font-family: 'JetBrains Mono', monospace;">Fortschritt</h3>
+                    @php
+                        $completedPhases = $this->phases->where('status.value', 'completed')->count();
+                        $totalPhases = $this->phases->count();
+                        $progress = $totalPhases > 0 ? round(($completedPhases / $totalPhases) * 100) : 0;
+                        $circumference = 2 * M_PI * 36;
+                        $dashOffset = $circumference - ($circumference * $progress / 100);
+                    @endphp
+                    <div class="flex justify-center mb-3">
+                        <div class="relative">
+                            <svg width="80" height="80" viewBox="0 0 96 96">
+                                <circle cx="48" cy="48" r="36" fill="none" stroke="#E5E7EB" stroke-width="6" />
+                                <circle cx="48" cy="48" r="36" fill="none" stroke="#3B82F6" stroke-width="6"
+                                        stroke-dasharray="{{ $circumference }}"
+                                        stroke-dashoffset="{{ $dashOffset }}"
+                                        stroke-linecap="round"
+                                        transform="rotate(-90 48 48)"
+                                        style="transition: stroke-dashoffset 0.5s ease;" />
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <span class="text-base font-bold text-gray-900" style="font-family: 'JetBrains Mono', monospace;">{{ $progress }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center text-xs text-gray-500 mb-3">
+                        {{ $completedPhases }}/{{ $totalPhases }} Phasen
+                    </div>
+                    <div class="space-y-1.5">
+                        @foreach($this->phases as $phase)
+                            @php
+                                $phaseColor = $phase->phase_number->color();
+                                $isActive = in_array($phase->status->value, ['completed', 'in_progress']);
+                                $shapeColor = $isActive ? $phaseColor : '#D1D5DB';
+                            @endphp
+                            <div class="flex items-center gap-2.5 text-xs">
+                                <svg width="14" height="14" viewBox="0 0 16 16" style="color: {{ $shapeColor }};">
+                                    @switch($phase->phase_number->shape())
+                                        @case('triangle')
+                                            <polygon points="8,1 15,15 1,15" fill="currentColor"/>
+                                            @break
+                                        @case('diamond')
+                                            <polygon points="8,1 15,8 8,15 1,8" fill="currentColor"/>
+                                            @break
+                                        @case('circle')
+                                            <circle cx="8" cy="8" r="7" fill="currentColor"/>
+                                            @break
+                                        @case('square')
+                                            <rect x="1" y="1" width="14" height="14" fill="currentColor"/>
+                                            @break
+                                        @case('hexagon')
+                                            <polygon points="8,1 14,4 14,12 8,15 2,12 2,4" fill="currentColor"/>
+                                            @break
+                                        @case('pentagon')
+                                            <polygon points="8,1 15,6 12,15 4,15 1,6" fill="currentColor"/>
+                                            @break
+                                        @case('octagon')
+                                            <polygon points="5,1 11,1 15,5 15,11 11,15 5,15 1,11 1,5" fill="currentColor"/>
+                                            @break
+                                    @endswitch
+                                </svg>
+                                <span class="truncate {{ $phase->status->value === 'completed' ? 'line-through opacity-50' : '' }} {{ $phase->status->value === 'in_progress' ? 'font-medium' : '' }}">
+                                    {{ $phase->phase_number->shortLabel() }}
+                                </span>
+                                @if($phase->status->value === 'completed')
+                                    <span class="ml-auto text-[10px]" style="color: {{ $phaseColor }};">&#10003;</span>
+                                @elseif($phase->status->value === 'in_progress')
+                                    <span class="ml-auto w-1.5 h-1.5 rounded-full animate-pulse" style="background: {{ $phaseColor }};"></span>
+                                @endif
+                            </div>
+                        @endforeach
                     </div>
                 </div>
-            </div>
-            <div class="text-center text-xs text-[color:var(--ui-secondary)] mb-4">
-                {{ $completedPhases }}/{{ $totalPhases }} Phasen
-            </div>
 
-            {{-- 8 Mini Bauhaus shapes --}}
-            <div class="space-y-1.5">
-                @foreach($this->phases as $phase)
-                    @php
-                        $phaseColor = $phase->phase_number->color();
-                        $isActive = in_array($phase->status->value, ['completed', 'in_progress']);
-                        $shapeColor = $isActive ? $phaseColor : '#D1D5DB';
-                    @endphp
-                    <div class="flex items-center gap-2.5 text-xs">
-                        <svg width="14" height="14" viewBox="0 0 16 16" style="color: {{ $shapeColor }};">
-                            @switch($phase->phase_number->shape())
-                                @case('triangle')
-                                    <polygon points="8,1 15,15 1,15" fill="currentColor"/>
-                                    @break
-                                @case('diamond')
-                                    <polygon points="8,1 15,8 8,15 1,8" fill="currentColor"/>
-                                    @break
-                                @case('circle')
-                                    <circle cx="8" cy="8" r="7" fill="currentColor"/>
-                                    @break
-                                @case('square')
-                                    <rect x="1" y="1" width="14" height="14" fill="currentColor"/>
-                                    @break
-                                @case('hexagon')
-                                    <polygon points="8,1 14,4 14,12 8,15 2,12 2,4" fill="currentColor"/>
-                                    @break
-                                @case('pentagon')
-                                    <polygon points="8,1 15,6 12,15 4,15 1,6" fill="currentColor"/>
-                                    @break
-                                @case('octagon')
-                                    <polygon points="5,1 11,1 15,5 15,11 11,15 5,15 1,11 1,5" fill="currentColor"/>
-                                    @break
-                            @endswitch
-                        </svg>
-                        <span class="truncate {{ $phase->status->value === 'completed' ? 'line-through opacity-50' : '' }} {{ $phase->status->value === 'in_progress' ? 'font-medium' : '' }}">
-                            {{ $phase->phase_number->shortLabel() }}
-                        </span>
-                        @if($phase->status->value === 'completed')
-                            <span class="ml-auto text-[10px]" style="color: {{ $phaseColor }};">&#10003;</span>
-                        @elseif($phase->status->value === 'in_progress')
-                            <span class="ml-auto w-1.5 h-1.5 rounded-full animate-pulse" style="background: {{ $phaseColor }};"></span>
+                {{-- Key Metrics --}}
+                <div class="border-t border-gray-200 pt-4">
+                    <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 mb-2" style="font-family: 'JetBrains Mono', monospace;">Kennzahlen</h3>
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Massnahmen offen</span>
+                            <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $this->openActionsCount }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Stakeholder</span>
+                            <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $this->stakeholders->count() }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Log-Eintraege</span>
+                            <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $this->totalLogsCount }}</span>
+                        </div>
+                        @if($project->target_date)
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Zieldatum</span>
+                                <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $project->target_date->format('d.m.Y') }}</span>
+                            </div>
                         @endif
                     </div>
-                @endforeach
+                </div>
             </div>
-        </div>
-
-        {{-- Key Metrics --}}
-        <div class="px-4 py-4 border-t border-[color:var(--ui-border)]">
-            <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--ui-muted)] mb-2" style="font-family: 'JetBrains Mono', monospace;">Kennzahlen</h3>
-            <div class="space-y-2 text-xs">
-                <div class="flex justify-between">
-                    <span class="text-[color:var(--ui-secondary)]">Maßnahmen offen</span>
-                    <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $this->openActionsCount }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-[color:var(--ui-secondary)]">Stakeholder</span>
-                    <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $this->stakeholders->count() }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-[color:var(--ui-secondary)]">Log-Einträge</span>
-                    <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $this->totalLogsCount }}</span>
-                </div>
-                @if($project->target_date)
-                    <div class="flex justify-between">
-                        <span class="text-[color:var(--ui-secondary)]">Zieldatum</span>
-                        <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $project->target_date->format('d.m.Y') }}</span>
-                    </div>
-                @endif
-            </div>
-        </div>
+        </x-ui-page-sidebar>
     </x-slot>
 
-    <x-slot name="main">
+    {{-- Main content (default slot) --}}
+    <x-ui-page-container>
 
         {{-- ═══════════════════════════════════════════════════════════ --}}
         {{-- TAB: BOARD --}}
@@ -756,7 +759,7 @@
                 </div>
             </div>
         @endif
-    </x-slot>
+    </x-ui-page-container>
 
     {{-- ═══════════════════════════════════════════════════════════ --}}
     {{-- MODALS --}}
