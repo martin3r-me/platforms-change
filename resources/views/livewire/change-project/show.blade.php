@@ -204,7 +204,8 @@
     </x-slot>
 
     {{-- Main content (default slot) --}}
-    <x-ui-page-container class="pt-6">
+    <x-ui-page-container>
+        <div class="py-6">
 
         {{-- ═══════════════════════════════════════════════════════════ --}}
         {{-- TAB: BOARD --}}
@@ -212,14 +213,14 @@
         @if($activeTab === 'board')
 
             {{-- ═══════════════════════════════════════════════════════ --}}
-            {{-- PHASE JOURNEY BAR --}}
+            {{-- PHASE JOURNEY BAR (in Card) --}}
             {{-- ═══════════════════════════════════════════════════════ --}}
-            <div class="mb-6">
-                <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--ui-text)] mb-5" style="font-family: 'JetBrains Mono', monospace;">KOTTER 8-STEP MODEL</h2>
+            <div class="mb-8 rounded-xl border border-black/5 bg-white/60 backdrop-blur-sm p-5 pb-4">
+                <h2 class="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--ui-muted)] mb-4" style="font-family: 'JetBrains Mono', monospace;">KOTTER 8-STEP MODEL</h2>
 
-                <div class="relative px-4">
+                <div class="relative px-2">
                     {{-- Connection line (background) --}}
-                    <div class="absolute top-[20px] left-[calc(2rem+20px)] right-[calc(2rem+20px)] h-[2px] bg-[#E5E7EB]"></div>
+                    <div class="absolute top-[20px] left-[calc(1rem+20px)] right-[calc(1rem+20px)] h-[2px] bg-black/[0.06]"></div>
 
                     {{-- Colored progress line overlay --}}
                     @php
@@ -232,7 +233,7 @@
                         $progressPercent = $lastActiveIndex >= 0 ? ($lastActiveIndex / 7) * 100 : 0;
                     @endphp
                     @if($lastActiveIndex >= 0)
-                        <div class="absolute top-[20px] left-[calc(2rem+20px)] h-[2px] transition-all duration-700 ease-out"
+                        <div class="absolute top-[20px] left-[calc(1rem+20px)] h-[2px] transition-all duration-700 ease-out"
                              style="width: {{ $progressPercent }}%; background: linear-gradient(90deg, #E63946, #F4A261, #E9C46A, #2A9D8F, #457B9D);"></div>
                     @endif
 
@@ -250,9 +251,9 @@
                                 $strokeColor = $isBlocked ? '#EF4444' : 'none';
                                 $strokeWidth = $isBlocked ? '2' : '0';
                             @endphp
-                            <div class="flex flex-col items-center" style="width: 60px;">
+                            <button wire:click="editPhase({{ $phase->id }})" class="flex flex-col items-center group cursor-pointer" style="width: 60px;" title="{{ $phase->phase_number->label() }}">
                                 {{-- Shape container with optional glow --}}
-                                <div class="relative flex items-center justify-center w-[40px] h-[40px] {{ $isActive ? 'animate-pulse' : '' }}">
+                                <div class="relative flex items-center justify-center w-[40px] h-[40px] transition-transform duration-200 group-hover:scale-110">
                                     @if($isActive)
                                         {{-- Glow ring for active phase --}}
                                         <div class="absolute inset-[-6px] rounded-full opacity-40 animate-ping" style="background: {{ $jColor }}; animation-duration: 2s;"></div>
@@ -295,14 +296,12 @@
                                         @endif
                                     </svg>
                                 </div>
-                                {{-- Phase number + short label --}}
-                                <span class="mt-1.5 text-[10px] font-bold {{ $isFilled ? 'text-[color:var(--ui-text)]' : 'text-[color:var(--ui-muted)]' }}"
-                                      style="font-family: 'JetBrains Mono', monospace;">{{ $phase->phase_number->value }}</span>
-                                <span class="text-[9px] text-center leading-tight max-w-[60px] truncate {{ !$isFilled ? 'text-[color:var(--ui-muted)]' : '' }}"
+                                {{-- Short label only (no redundant number) --}}
+                                <span class="mt-1.5 text-[9px] text-center leading-tight max-w-[60px] truncate font-medium {{ !$isFilled ? 'text-[color:var(--ui-muted)]' : '' }}"
                                       @if($isFilled) style="color: {{ $jColor }};" @endif>
                                     {{ $phase->phase_number->shortLabel() }}
                                 </span>
-                            </div>
+                            </button>
                         @endforeach
                     </div>
                 </div>
@@ -367,7 +366,7 @@
                             <div class="flex items-center gap-2 mb-1">
                                 <x-ui-badge size="xs" color="primary">In Bearbeitung</x-ui-badge>
                             </div>
-                            <h3 class="text-lg font-bold text-[color:var(--ui-text)] mb-1" style="color: {{ $spotColor }};">
+                            <h3 class="text-lg font-bold mb-1" style="color: {{ $spotColor }};">
                                 {{ $activePhase->phase_number->label() }}
                             </h3>
                             <p class="text-xs text-[color:var(--ui-secondary)] mb-2 line-clamp-2">
@@ -399,46 +398,76 @@
                                 </x-ui-button>
                                 <x-ui-button variant="primary" size="xs" wire:click="createAction({{ $activePhase->id }})">
                                     @svg('heroicon-o-plus', 'w-3 h-3')
-                                    Maßnahme
+                                    Massnahme
                                 </x-ui-button>
                             </div>
                         </div>
                     </div>
                 </div>
             @else
-                {{-- No active phase banner --}}
-                <div class="mb-8 rounded-xl border border-dashed border-black/10 bg-white/40 p-4 text-center">
-                    <p class="text-xs text-[color:var(--ui-secondary)]">
-                        @svg('heroicon-o-information-circle', 'w-4 h-4 inline-block mb-0.5')
-                        Keine Phase in Bearbeitung &mdash; starten Sie mit Phase 1
-                    </p>
+                {{-- No active phase — inviting CTA --}}
+                @php $firstPhase = $this->phases->first(); @endphp
+                <div class="mb-8 rounded-xl border border-dashed border-black/10 bg-white/40 p-6 text-center">
+                    <div class="flex flex-col items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-black/[0.04] flex items-center justify-center">
+                            @svg('heroicon-o-play', 'w-5 h-5 text-[color:var(--ui-secondary)]')
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-[color:var(--ui-text)] mb-1">Kein aktiver Schritt</p>
+                            <p class="text-xs text-[color:var(--ui-secondary)]">Starten Sie den Change-Prozess, indem Sie Phase 1 in Bearbeitung setzen.</p>
+                        </div>
+                        @if($firstPhase && $firstPhase->status->value === 'not_started')
+                            <x-ui-button variant="primary" size="xs" wire:click="quickUpdatePhaseStatus({{ $firstPhase->id }}, 'in_progress')">
+                                @svg('heroicon-o-play', 'w-3.5 h-3.5')
+                                Phase 1 starten
+                            </x-ui-button>
+                        @endif
+                    </div>
                 </div>
             @endif
 
-            {{-- Stage I: Voraussetzungen schaffen (Phases 1-4, warm colors) --}}
-            <div class="mb-2">
-                <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--ui-muted)] mb-3" style="font-family: 'JetBrains Mono', monospace;">I. Voraussetzungen schaffen</h3>
+            {{-- ═══════════════════════════════════════════════════════ --}}
+            {{-- STAGE I --}}
+            {{-- ═══════════════════════════════════════════════════════ --}}
+            <div class="flex items-center gap-2 mb-3">
+                <div class="h-px flex-1 bg-gradient-to-r from-[#E63946]/20 via-[#F4A261]/20 to-transparent"></div>
+                <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--ui-muted)] flex-shrink-0" style="font-family: 'JetBrains Mono', monospace;">I. Voraussetzungen schaffen</h3>
+                <div class="h-px flex-1 bg-gradient-to-l from-[#E63946]/20 via-[#F4A261]/20 to-transparent"></div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
                 @foreach($this->phases->take(4) as $phase)
                     @include('change::livewire.change-project._phase-card', ['phase' => $phase])
                 @endforeach
             </div>
 
-            {{-- Stage II: Umsetzen & Verankern (Phases 5-8, cool colors) --}}
-            <div class="mb-2">
-                <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--ui-muted)] mb-3" style="font-family: 'JetBrains Mono', monospace;">II. Umsetzen & Verankern</h3>
+            {{-- ═══════════════════════════════════════════════════════ --}}
+            {{-- STAGE II --}}
+            {{-- ═══════════════════════════════════════════════════════ --}}
+            <div class="flex items-center gap-2 mb-3">
+                <div class="h-px flex-1 bg-gradient-to-r from-[#2A9D8F]/20 via-[#457B9D]/20 to-transparent"></div>
+                <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--ui-muted)] flex-shrink-0" style="font-family: 'JetBrains Mono', monospace;">II. Umsetzen & Verankern</h3>
+                <div class="h-px flex-1 bg-gradient-to-l from-[#2A9D8F]/20 via-[#457B9D]/20 to-transparent"></div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
                 @foreach($this->phases->skip(4) as $phase)
                     @include('change::livewire.change-project._phase-card', ['phase' => $phase])
                 @endforeach
             </div>
 
-            {{-- Actions overview below the board --}}
-            <div class="mt-8">
+            {{-- ═══════════════════════════════════════════════════════ --}}
+            {{-- MASSNAHMEN (in Card) --}}
+            {{-- ═══════════════════════════════════════════════════════ --}}
+            <div class="rounded-xl border border-black/5 bg-white/60 backdrop-blur-sm p-5">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-[color:var(--ui-text)]" style="font-family: 'JetBrains Mono', monospace;">Alle Maßnahmen</h2>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-[rgb(var(--ui-primary-rgb))]/10 flex items-center justify-center">
+                            @svg('heroicon-o-clipboard-document-list', 'w-4 h-4 text-[rgb(var(--ui-primary-rgb))]')
+                        </div>
+                        <div>
+                            <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-[color:var(--ui-text)]" style="font-family: 'JetBrains Mono', monospace;">Alle Massnahmen</h2>
+                            <p class="text-[10px] text-[color:var(--ui-muted)]">{{ $this->actions->count() }} gesamt &middot; {{ $this->openActionsCount }} offen</p>
+                        </div>
+                    </div>
                     <div class="flex items-center gap-2">
                         <x-ui-input-select
                             name="actionStatusFilter"
@@ -456,14 +485,24 @@
                 </div>
 
                 @if($this->actions->isEmpty())
-                    <p class="text-xs text-[color:var(--ui-secondary)]">Keine Maßnahmen vorhanden.</p>
+                    <div class="rounded-lg border border-dashed border-black/10 bg-black/[0.02] py-8 text-center">
+                        <div class="flex flex-col items-center gap-2">
+                            @svg('heroicon-o-clipboard-document-list', 'w-8 h-8 text-[color:var(--ui-muted)]')
+                            <p class="text-sm text-[color:var(--ui-secondary)]">Noch keine Massnahmen definiert</p>
+                            <p class="text-xs text-[color:var(--ui-muted)]">Massnahmen sind konkrete Aufgaben innerhalb einer Phase.</p>
+                            <x-ui-button variant="secondary" size="xs" wire:click="createAction" class="mt-1">
+                                @svg('heroicon-o-plus', 'w-3.5 h-3.5')
+                                Erste Massnahme erstellen
+                            </x-ui-button>
+                        </div>
+                    </div>
                 @else
                     <div class="space-y-2">
                         @foreach($this->actions as $action)
                             @php
                                 $actionPhaseColor = $action->phase ? $action->phase->phase_number->color() : null;
                             @endphp
-                            <div class="flex items-center gap-3 rounded-lg border border-black/5 bg-white/60 backdrop-blur-sm px-4 py-3 {{ $actionPhaseColor ? 'border-l-[3px]' : '' }}"
+                            <div class="flex items-center gap-3 rounded-lg border border-black/5 bg-white/80 px-4 py-3 {{ $actionPhaseColor ? 'border-l-[3px]' : '' }} hover:bg-white transition-colors"
                                  @if($actionPhaseColor) style="border-left-color: {{ $actionPhaseColor }};" @endif>
                                 <button wire:click="quickUpdateActionStatus({{ $action->id }}, '{{ $action->status->value === 'done' ? 'open' : 'done' }}')"
                                         class="flex-shrink-0 {{ $action->status->value === 'done' ? 'text-[rgb(var(--ui-success-rgb))]' : 'text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-success-rgb))]' }} transition-colors">
@@ -817,6 +856,7 @@
                 </div>
             </div>
         @endif
+        </div>
     </x-ui-page-container>
 
     {{-- ═══════════════════════════════════════════════════════════ --}}
