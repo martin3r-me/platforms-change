@@ -8,6 +8,7 @@ use Platform\Core\Contracts\ToolMetadataContract;
 use Platform\Core\Contracts\ToolResult;
 use Platform\Change\Models\ChangeProject;
 use Platform\Change\Tools\Concerns\ResolvesChangeTeam;
+use Platform\Organization\Services\StorePlannedPeriod;
 
 class CreateChangeProjectTool implements ToolContract, ToolMetadataContract
 {
@@ -59,12 +60,26 @@ class CreateChangeProjectTool implements ToolContract, ToolMetadataContract
                 'code'              => ($arguments['code'] ?? null) ?: null,
                 'description'       => ($arguments['description'] ?? null) ?: null,
                 'status'            => $arguments['status'] ?? 'draft',
-                'target_date'       => ($arguments['target_date'] ?? null) ?: null,
                 'owner_entity_id'   => ! empty($arguments['owner_entity_id']) ? (int) $arguments['owner_entity_id'] : null,
                 'urgency_statement' => ($arguments['urgency_statement'] ?? null) ?: null,
                 'vision_statement'  => ($arguments['vision_statement'] ?? null) ?: null,
                 'metadata'          => $arguments['metadata'] ?? null,
             ]);
+
+            // Soll-Zeitraum über zentrales System speichern (target_date → planned_end)
+            $targetDate = ($arguments['target_date'] ?? null) ?: null;
+            if ($targetDate) {
+                app(StorePlannedPeriod::class)->store([
+                    'team_id' => $rootTeamId,
+                    'user_id' => $context->user?->id,
+                    'context_type' => ChangeProject::class,
+                    'context_id' => $project->id,
+                    'planned_start' => null,
+                    'planned_end' => $targetDate,
+                    'note' => null,
+                    'is_active' => true,
+                ]);
+            }
 
             // Auto-create 8 Kotter phases
             $project->createDefaultPhases();

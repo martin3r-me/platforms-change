@@ -132,10 +132,10 @@
                             <span class="text-gray-500">Log-Eintraege</span>
                             <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $this->totalLogsCount }}</span>
                         </div>
-                        @if($project->target_date)
+                        @if($project->plannedEnd())
                             <div class="flex justify-between">
                                 <span class="text-gray-500">Zieldatum</span>
-                                <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $project->target_date->format('d.m.Y') }}</span>
+                                <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $project->plannedEnd()->format('d.m.Y') }}</span>
                             </div>
                         @endif
                     </div>

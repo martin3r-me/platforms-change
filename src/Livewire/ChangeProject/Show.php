@@ -19,6 +19,8 @@ use Platform\Change\Models\ChangePhase;
 use Platform\Change\Models\ChangeProject;
 use Platform\Change\Models\ChangeStakeholder;
 use Platform\Organization\Models\OrganizationEntity;
+use Platform\Organization\Models\OrganizationTimePeriod;
+use Platform\Organization\Services\StorePlannedPeriod;
 
 class Show extends Component
 {
@@ -79,7 +81,7 @@ class Show extends Component
 
     public function mount(ChangeProject $project): void
     {
-        $this->project = $project->load(['ownerEntity', 'user']);
+        $this->project = $project->load(['ownerEntity', 'user', 'plannedPeriodEntries']);
         $this->loadForm();
     }
 
@@ -90,7 +92,7 @@ class Show extends Component
             'code'              => $this->project->code ?? '',
             'description'       => $this->project->description ?? '',
             'status'            => $this->project->status?->value ?? 'draft',
-            'target_date'       => $this->project->target_date?->format('Y-m-d'),
+            'target_date'       => $this->project->plannedEnd()?->format('Y-m-d'),
             'owner_entity_id'   => (string) ($this->project->owner_entity_id ?? ''),
             'urgency_statement' => $this->project->urgency_statement ?? '',
             'vision_statement'  => $this->project->vision_statement ?? '',
@@ -104,7 +106,7 @@ class Show extends Component
                $this->form['code'] !== ($this->project->code ?? '') ||
                $this->form['description'] !== ($this->project->description ?? '') ||
                $this->form['status'] !== ($this->project->status?->value ?? 'draft') ||
-               $this->form['target_date'] !== $this->project->target_date?->format('Y-m-d') ||
+               $this->form['target_date'] !== $this->project->plannedEnd()?->format('Y-m-d') ||
                $this->form['owner_entity_id'] != ($this->project->owner_entity_id ?? '') ||
                $this->form['urgency_statement'] !== ($this->project->urgency_statement ?? '') ||
                $this->form['vision_statement'] !== ($this->project->vision_statement ?? '');
@@ -225,7 +227,6 @@ class Show extends Component
             'code'              => $this->form['code'] !== '' ? $this->form['code'] : null,
             'description'       => $this->form['description'] !== '' ? $this->form['description'] : null,
             'status'            => $this->form['status'],
-            'target_date'       => $this->form['target_date'] ?: null,
             'owner_entity_id'   => $this->form['owner_entity_id'] !== '' ? (int) $this->form['owner_entity_id'] : null,
             'urgency_statement' => $this->form['urgency_statement'] !== '' ? $this->form['urgency_statement'] : null,
             'vision_statement'  => $this->form['vision_statement'] !== '' ? $this->form['vision_statement'] : null,
@@ -238,6 +239,29 @@ class Show extends Component
         }
 
         $this->project->update($update);
+
+        // Soll-Zeitraum über zentrales System speichern (target_date → planned_end)
+        $plannedEnd = $this->form['target_date'] ?: null;
+        $existingPeriod = OrganizationTimePeriod::where('context_type', ChangeProject::class)
+            ->where('context_id', $this->project->id)
+            ->where('is_active', true)
+            ->first();
+
+        if ($existingPeriod) {
+            app(StorePlannedPeriod::class)->update($existingPeriod, ['planned_end' => $plannedEnd]);
+        } elseif ($plannedEnd) {
+            app(StorePlannedPeriod::class)->store([
+                'team_id' => $this->project->team_id,
+                'user_id' => Auth::id(),
+                'context_type' => ChangeProject::class,
+                'context_id' => $this->project->id,
+                'planned_start' => null,
+                'planned_end' => $plannedEnd,
+                'note' => null,
+                'is_active' => true,
+            ]);
+        }
+
         $this->project->refresh();
         $this->loadForm();
         $this->dispatch('toast', message: 'Projekt gespeichert');

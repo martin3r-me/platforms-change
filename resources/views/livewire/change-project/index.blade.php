@@ -148,10 +148,10 @@
                                     @svg('heroicon-o-clipboard-document-list', 'w-3.5 h-3.5')
                                     {{ $project->actions_count }} Maßnahmen
                                 </span>
-                                @if($project->target_date)
+                                @if($project->plannedEnd())
                                     <span class="flex items-center gap-1" style="font-family: 'JetBrains Mono', monospace;">
                                         @svg('heroicon-o-calendar', 'w-3.5 h-3.5')
-                                        {{ $project->target_date->format('d.m.Y') }}
+                                        {{ $project->plannedEnd()->format('d.m.Y') }}
                                     </span>
                                 @endif
                                 @if($project->ownerEntity)

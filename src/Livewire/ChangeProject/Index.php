@@ -8,6 +8,8 @@ use Livewire\Component;
 use Platform\Change\Enums\ChangeProjectStatus;
 use Platform\Change\Models\ChangeProject;
 use Platform\Organization\Models\OrganizationEntity;
+use Platform\Organization\Models\OrganizationTimePeriod;
+use Platform\Organization\Services\StorePlannedPeriod;
 
 class Index extends Component
 {
@@ -72,7 +74,7 @@ class Index extends Component
             $q->where('status', $this->statusFilter);
         }
 
-        return $q->with(['ownerEntity', 'phases'])
+        return $q->with(['ownerEntity', 'phases', 'plannedPeriodEntries'])
             ->orderBy('name')
             ->get();
     }
@@ -106,7 +108,7 @@ class Index extends Component
             'code'              => (string) ($project->code ?? ''),
             'description'       => (string) ($project->description ?? ''),
             'status'            => $project->status?->value ?? 'draft',
-            'target_date'       => $project->target_date?->format('Y-m-d'),
+            'target_date'       => $project->plannedEnd()?->format('Y-m-d'),
             'owner_entity_id'   => (string) ($project->owner_entity_id ?? ''),
             'urgency_statement' => (string) ($project->urgency_statement ?? ''),
             'vision_statement'  => (string) ($project->vision_statement ?? ''),
@@ -118,12 +120,13 @@ class Index extends Component
     {
         $data = $this->validate()['form'];
 
+        $targetDate = $data['target_date'] ?: null;
+
         $payload = [
             'name'              => trim($data['name']),
             'code'              => $data['code'] !== '' ? $data['code'] : null,
             'description'       => $data['description'] !== '' ? $data['description'] : null,
             'status'            => $data['status'],
-            'target_date'       => $data['target_date'] ?: null,
             'owner_entity_id'   => $data['owner_entity_id'] !== '' ? (int) $data['owner_entity_id'] : null,
             'urgency_statement' => $data['urgency_statement'] !== '' ? $data['urgency_statement'] : null,
             'vision_statement'  => $data['vision_statement'] !== '' ? $data['vision_statement'] : null,
@@ -133,6 +136,28 @@ class Index extends Component
             $project = ChangeProject::where('team_id', Auth::user()->currentTeamRelation?->getRootTeam()?->id)->find($this->editingId);
             if ($project) {
                 $project->update($payload);
+
+                // Soll-Zeitraum aktualisieren
+                $existingPeriod = OrganizationTimePeriod::where('context_type', ChangeProject::class)
+                    ->where('context_id', $project->id)
+                    ->where('is_active', true)
+                    ->first();
+
+                if ($existingPeriod) {
+                    app(StorePlannedPeriod::class)->update($existingPeriod, ['planned_end' => $targetDate]);
+                } elseif ($targetDate) {
+                    app(StorePlannedPeriod::class)->store([
+                        'team_id' => $project->team_id,
+                        'user_id' => Auth::id(),
+                        'context_type' => ChangeProject::class,
+                        'context_id' => $project->id,
+                        'planned_start' => null,
+                        'planned_end' => $targetDate,
+                        'note' => null,
+                        'is_active' => true,
+                    ]);
+                }
+
                 $this->dispatch('toast', message: 'Projekt aktualisiert');
             }
         } else {
@@ -140,6 +165,21 @@ class Index extends Component
                 'team_id' => Auth::user()->currentTeamRelation?->getRootTeam()?->id,
                 'user_id' => Auth::id(),
             ]));
+
+            // Soll-Zeitraum erstellen
+            if ($targetDate) {
+                app(StorePlannedPeriod::class)->store([
+                    'team_id' => $project->team_id,
+                    'user_id' => Auth::id(),
+                    'context_type' => ChangeProject::class,
+                    'context_id' => $project->id,
+                    'planned_start' => null,
+                    'planned_end' => $targetDate,
+                    'note' => null,
+                    'is_active' => true,
+                ]);
+            }
+
             $project->createDefaultPhases();
             $this->dispatch('toast', message: 'Projekt mit 8 Kotter-Phasen erstellt');
         }

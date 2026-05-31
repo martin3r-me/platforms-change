@@ -42,7 +42,7 @@ class ChangeEntityLinkProvider implements EntityLinkProvider, HasMetricDefinitio
             'code' => $model->code,
             'status' => $model->status?->value ?? null,
             'progress' => $model->progress ?? 0,
-            'target_date' => $model->target_date?->format('d.m.Y'),
+            'target_date' => $model->plannedEnd()?->format('d.m.Y'),
             'phases_count' => $model->phases_count ?? 0,
             'actions_count' => $model->actions_count ?? 0,
         ];

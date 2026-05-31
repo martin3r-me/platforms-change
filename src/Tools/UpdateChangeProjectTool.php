@@ -9,6 +9,8 @@ use Platform\Core\Contracts\ToolResult;
 use Platform\Core\Tools\Concerns\HasStandardizedWriteOperations;
 use Platform\Change\Models\ChangeProject;
 use Platform\Change\Tools\Concerns\ResolvesChangeTeam;
+use Platform\Organization\Models\OrganizationTimePeriod;
+use Platform\Organization\Services\StorePlannedPeriod;
 
 class UpdateChangeProjectTool implements ToolContract, ToolMetadataContract
 {
@@ -79,7 +81,27 @@ class UpdateChangeProjectTool implements ToolContract, ToolMetadataContract
             }
             if (array_key_exists('target_date', $arguments)) {
                 $val = (string) ($arguments['target_date'] ?? '');
-                $update['target_date'] = $val === '' ? null : $val;
+                $plannedEnd = $val === '' ? null : $val;
+
+                $existingPeriod = OrganizationTimePeriod::where('context_type', ChangeProject::class)
+                    ->where('context_id', $project->id)
+                    ->where('is_active', true)
+                    ->first();
+
+                if ($existingPeriod) {
+                    app(StorePlannedPeriod::class)->update($existingPeriod, ['planned_end' => $plannedEnd]);
+                } elseif ($plannedEnd) {
+                    app(StorePlannedPeriod::class)->store([
+                        'team_id' => $rootTeamId,
+                        'user_id' => $context->user?->id,
+                        'context_type' => ChangeProject::class,
+                        'context_id' => $project->id,
+                        'planned_start' => null,
+                        'planned_end' => $plannedEnd,
+                        'note' => null,
+                        'is_active' => true,
+                    ]);
+                }
             }
             if (array_key_exists('owner_entity_id', $arguments)) {
                 $val = $arguments['owner_entity_id'];

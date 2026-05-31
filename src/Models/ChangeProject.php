@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Platform\Organization\Traits\HasPlannedPeriod;
 use Platform\Core\Models\Team;
 use Platform\Core\Models\User;
 use Platform\Change\Enums\ChangeProjectStatus;
@@ -18,20 +19,19 @@ use Symfony\Component\Uid\UuidV7;
 
 class ChangeProject extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasPlannedPeriod;
 
     protected $table = 'change_projects';
 
     protected $fillable = [
         'uuid', 'team_id', 'user_id', 'name', 'code', 'description',
-        'status', 'target_date', 'owner_entity_id',
+        'status', 'owner_entity_id',
         'urgency_statement', 'vision_statement',
         'metadata', 'completed_at',
     ];
 
     protected $casts = [
         'status' => ChangeProjectStatus::class,
-        'target_date' => 'date',
         'metadata' => 'array',
         'completed_at' => 'datetime',
     ];

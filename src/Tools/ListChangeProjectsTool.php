@@ -43,7 +43,8 @@ class ListChangeProjectsTool implements ToolContract, ToolMetadataContract
             if ($resolved['error']) return $resolved['error'];
             $rootTeamId = (int) $resolved['root_team_id'];
 
-            $q = ChangeProject::query()->where('team_id', $rootTeamId);
+            $q = ChangeProject::query()->where('team_id', $rootTeamId)
+                ->with('plannedPeriodEntries');
 
             if (array_key_exists('status', $arguments) && $arguments['status'] !== null && $arguments['status'] !== '') {
                 $q->where('status', (string) $arguments['status']);
@@ -54,7 +55,7 @@ class ListChangeProjectsTool implements ToolContract, ToolMetadataContract
 
             $this->applyStandardFilters($q, $arguments, ['team_id', 'status', 'owner_entity_id', 'created_at']);
             $this->applyStandardSearch($q, $arguments, ['name', 'code', 'description']);
-            $this->applyStandardSort($q, $arguments, ['name', 'code', 'status', 'id', 'created_at', 'target_date'], 'name', 'asc');
+            $this->applyStandardSort($q, $arguments, ['name', 'code', 'status', 'id', 'created_at'], 'name', 'asc');
 
             $result = $this->applyStandardPaginationResult($q, $arguments);
             $items = $result['data']->map(fn (ChangeProject $p) => [
@@ -64,7 +65,7 @@ class ListChangeProjectsTool implements ToolContract, ToolMetadataContract
                 'code'            => $p->code,
                 'description'     => $p->description,
                 'status'          => $p->status,
-                'target_date'     => $p->target_date?->toDateString(),
+                'target_date'     => $p->plannedEnd()?->toDateString(),
                 'owner_entity_id' => $p->owner_entity_id,
                 'progress'        => $p->progress,
                 'team_id'         => $p->team_id,
