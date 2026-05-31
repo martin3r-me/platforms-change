@@ -2,6 +2,7 @@
 
 namespace Platform\Change;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -20,6 +21,15 @@ class ChangeServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Morph-Map
+        Relation::morphMap([
+            'change_project'     => \Platform\Change\Models\ChangeProject::class,
+            'change_phase'       => \Platform\Change\Models\ChangePhase::class,
+            'change_action'      => \Platform\Change\Models\ChangeAction::class,
+            'change_stakeholder' => \Platform\Change\Models\ChangeStakeholder::class,
+            'change_log'         => \Platform\Change\Models\ChangeLog::class,
+        ]);
+
         // Config laden
         $this->mergeConfigFrom(__DIR__.'/../config/change.php', 'change');
 
@@ -61,6 +71,14 @@ class ChangeServiceProvider extends ServiceProvider
 
         // Tools registrieren
         $this->registerTools();
+
+        // EntityLinkProvider registrieren (loose Kopplung mit Organization-Modul)
+        try {
+            resolve(\Platform\Organization\Services\EntityLinkRegistry::class)
+                ->register(new \Platform\Change\Organization\ChangeEntityLinkProvider());
+        } catch (\Throwable $e) {
+            // Organization-Modul nicht geladen
+        }
 
         // Error Reporter
         try {
