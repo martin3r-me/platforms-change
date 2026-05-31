@@ -6,6 +6,20 @@
     <div>
         <h4 x-show="!collapsed" class="px-4 py-3 text-xs tracking-wide font-semibold text-gray-400 uppercase">Allgemein</h4>
 
+        {{-- Kotter Guide --}}
+        <a href="{{ route('change.kotter') }}"
+           class="relative flex items-center px-3 py-2 my-1 rounded-md font-medium transition"
+           :class="[
+               window.location.pathname.endsWith('/kotter')
+                   ? 'bg-gray-900 text-white shadow'
+                   : 'text-gray-900 hover:bg-gray-100',
+               collapsed ? 'justify-center' : 'gap-3'
+           ]"
+           wire:navigate>
+            <x-heroicon-o-academic-cap class="w-6 h-6 flex-shrink-0"/>
+            <span x-show="!collapsed" class="truncate">Kotter Guide</span>
+        </a>
+
         {{-- Projekte --}}
         <a href="{{ route('change.projects.index') }}"
            class="relative flex items-center px-3 py-2 my-1 rounded-md font-medium transition"
