@@ -114,6 +114,7 @@ class Show extends Component
     public function phases()
     {
         return $this->project->phases()
+            ->with('actions')
             ->withCount('actions')
             ->orderBy('phase_number')
             ->get();

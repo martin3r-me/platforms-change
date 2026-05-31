@@ -157,9 +157,20 @@
 
             {{-- Actions count --}}
             @if($phase->actions_count > 0)
-                <div class="text-[11px] text-[color:var(--ui-secondary)] mb-1.5">
-                    @svg('heroicon-o-clipboard-document-list', 'w-3 h-3 inline-block')
-                    {{ $phase->actions_count }} Maßnahmen
+                @php
+                    $phaseActionsOpen = $phase->actions->whereNotIn('status.value', ['done', 'cancelled'])->count();
+                    $phaseActionsDone = $phase->actions->where('status.value', 'done')->count();
+                @endphp
+                <div class="flex items-center gap-2 mb-1.5 rounded-md px-2 py-1 text-[11px]" style="background: {{ $phaseColor }}08;">
+                    @svg('heroicon-o-clipboard-document-list', 'w-3.5 h-3.5 flex-shrink-0')
+                    <span class="font-medium" style="color: {{ $phaseColor }};">{{ $phase->actions_count }}</span>
+                    <span class="text-[color:var(--ui-secondary)]">Massnahmen</span>
+                    @if($phaseActionsDone > 0)
+                        <span class="text-[10px] text-[rgb(var(--ui-success-rgb))]">({{ $phaseActionsDone }} erledigt)</span>
+                    @endif
+                    @if($phaseActionsOpen > 0)
+                        <span class="ml-auto text-[10px] font-medium" style="color: {{ $phaseColor }};">{{ $phaseActionsOpen }} offen</span>
+                    @endif
                 </div>
             @endif
 

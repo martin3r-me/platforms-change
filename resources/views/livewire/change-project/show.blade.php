@@ -38,7 +38,7 @@
     </x-slot>
 
     <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Projekt" width="w-56" :defaultOpen="true" side="left">
+        <x-ui-page-sidebar title="Projekt" :defaultOpen="true" side="left">
             <div class="p-4 space-y-5">
                 {{-- Progress --}}
                 <div>
@@ -522,70 +522,94 @@
                         </div>
                     </div>
                 @else
-                    <div class="space-y-2">
-                        @foreach($this->actions as $action)
+                    @php
+                        $actionsByPhase = $this->actions->groupBy(fn($a) => $a->change_phase_id ?? 0);
+                        $phaseMap = $this->phases->keyBy('id');
+                    @endphp
+                    <div class="space-y-5">
+                        @foreach($actionsByPhase->sortKeys() as $phaseId => $phaseActions)
                             @php
-                                $actionPhaseColor = $action->phase ? $action->phase->phase_number->color() : null;
+                                $groupPhase = $phaseId ? ($phaseMap[$phaseId] ?? null) : null;
+                                $groupColor = $groupPhase ? $groupPhase->phase_number->color() : '#94A3B8';
+                                $groupShape = $groupPhase ? $groupPhase->phase_number->shape() : null;
+                                $groupLabel = $groupPhase ? $groupPhase->phase_number->value . '. ' . $groupPhase->phase_number->shortLabel() : 'Ohne Phase';
                             @endphp
-                            <div class="flex items-center gap-3 rounded-lg border border-black/5 bg-white/80 px-4 py-3 {{ $actionPhaseColor ? 'border-l-[3px]' : '' }} hover:bg-white transition-colors"
-                                 @if($actionPhaseColor) style="border-left-color: {{ $actionPhaseColor }};" @endif>
-                                <button wire:click="quickUpdateActionStatus({{ $action->id }}, '{{ $action->status->value === 'done' ? 'open' : 'done' }}')"
-                                        class="flex-shrink-0 {{ $action->status->value === 'done' ? 'text-[rgb(var(--ui-success-rgb))]' : 'text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-success-rgb))]' }} transition-colors">
-                                    @svg($action->status->value === 'done' ? 'heroicon-s-check-circle' : 'heroicon-o-circle-stack', 'w-5 h-5')
-                                </button>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-sm font-medium {{ $action->status->value === 'done' ? 'line-through opacity-60' : '' }}">{{ $action->title }}</span>
-                                        <x-ui-badge :color="$action->status->color()" size="xs">{{ $action->status->label() }}</x-ui-badge>
-                                    </div>
-                                    <div class="flex items-center gap-3 text-xs text-[color:var(--ui-secondary)] mt-0.5">
-                                        @if($action->phase)
-                                            <span class="flex items-center gap-1">
-                                                <svg width="8" height="8" viewBox="0 0 16 16" style="color: {{ $action->phase->phase_number->color() }};">
-                                                    @switch($action->phase->phase_number->shape())
-                                                        @case('triangle')
-                                                            <polygon points="8,1 15,15 1,15" fill="currentColor"/>
-                                                            @break
-                                                        @case('diamond')
-                                                            <polygon points="8,1 15,8 8,15 1,8" fill="currentColor"/>
-                                                            @break
-                                                        @case('circle')
-                                                            <circle cx="8" cy="8" r="7" fill="currentColor"/>
-                                                            @break
-                                                        @case('square')
-                                                            <rect x="1" y="1" width="14" height="14" fill="currentColor"/>
-                                                            @break
-                                                        @case('hexagon')
-                                                            <polygon points="8,1 14,4 14,12 8,15 2,12 2,4" fill="currentColor"/>
-                                                            @break
-                                                        @case('pentagon')
-                                                            <polygon points="8,1 15,6 12,15 4,15 1,6" fill="currentColor"/>
-                                                            @break
-                                                        @case('octagon')
-                                                            <polygon points="5,1 11,1 15,5 15,11 11,15 5,15 1,11 1,5" fill="currentColor"/>
-                                                            @break
-                                                    @endswitch
-                                                </svg>
-                                                {{ $action->phase->phase_number->shortLabel() }}
-                                            </span>
-                                        @endif
-                                        @if($action->responsible)
-                                            <span>@svg('heroicon-o-user', 'w-3 h-3 inline-block') {{ $action->responsible }}</span>
-                                        @endif
-                                        @if($action->due_date)
-                                            <span class="{{ $action->due_date->isPast() && !in_array($action->status->value, ['done', 'cancelled']) ? 'text-[rgb(var(--ui-danger-rgb))] font-medium' : '' }}">
-                                                @svg('heroicon-o-calendar', 'w-3 h-3 inline-block') {{ $action->due_date->format('d.m.Y') }}
-                                            </span>
-                                        @endif
-                                    </div>
+                            <div>
+                                {{-- Phase group header --}}
+                                <div class="flex items-center gap-2 mb-2">
+                                    @if($groupPhase)
+                                        <svg width="14" height="14" viewBox="0 0 16 16" style="color: {{ $groupColor }};">
+                                            @switch($groupShape)
+                                                @case('triangle')
+                                                    <polygon points="8,1 15,15 1,15" fill="currentColor"/>
+                                                    @break
+                                                @case('diamond')
+                                                    <polygon points="8,1 15,8 8,15 1,8" fill="currentColor"/>
+                                                    @break
+                                                @case('circle')
+                                                    <circle cx="8" cy="8" r="7" fill="currentColor"/>
+                                                    @break
+                                                @case('square')
+                                                    <rect x="1" y="1" width="14" height="14" fill="currentColor"/>
+                                                    @break
+                                                @case('hexagon')
+                                                    <polygon points="8,1 14,4 14,12 8,15 2,12 2,4" fill="currentColor"/>
+                                                    @break
+                                                @case('pentagon')
+                                                    <polygon points="8,1 15,6 12,15 4,15 1,6" fill="currentColor"/>
+                                                    @break
+                                                @case('octagon')
+                                                    <polygon points="5,1 11,1 15,5 15,11 11,15 5,15 1,11 1,5" fill="currentColor"/>
+                                                    @break
+                                            @endswitch
+                                        </svg>
+                                    @else
+                                        @svg('heroicon-o-minus-circle', 'w-3.5 h-3.5 text-[color:var(--ui-muted)]')
+                                    @endif
+                                    <span class="text-[11px] font-bold uppercase tracking-wider" style="font-family: 'JetBrains Mono', monospace; color: {{ $groupColor }};">{{ $groupLabel }}</span>
+                                    <span class="text-[10px] text-[color:var(--ui-muted)]">{{ $phaseActions->count() }}</span>
+                                    <div class="flex-1 h-px" style="background: {{ $groupColor }}20;"></div>
+                                    @if($groupPhase)
+                                        <button wire:click="createAction({{ $groupPhase->id }})" class="text-[10px] font-medium transition-colors hover:opacity-100 opacity-60" style="color: {{ $groupColor }};">
+                                            @svg('heroicon-o-plus', 'w-3 h-3 inline-block') Hinzufuegen
+                                        </button>
+                                    @endif
                                 </div>
-                                <div class="flex items-center gap-1">
-                                    <button wire:click="editAction({{ $action->id }})" class="text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-primary-rgb))] transition-colors">
-                                        @svg('heroicon-o-pencil', 'w-4 h-4')
-                                    </button>
-                                    <button wire:click="deleteAction({{ $action->id }})" wire:confirm="Massnahme wirklich löschen?" class="text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-danger-rgb))] transition-colors">
-                                        @svg('heroicon-o-trash', 'w-4 h-4')
-                                    </button>
+
+                                {{-- Actions in this phase --}}
+                                <div class="space-y-1.5 ml-1.5 border-l-2 pl-3" style="border-color: {{ $groupColor }}20;">
+                                    @foreach($phaseActions as $action)
+                                        <div class="flex items-center gap-3 rounded-lg border border-black/5 bg-white/80 px-3 py-2.5 hover:bg-white transition-colors">
+                                            <button wire:click="quickUpdateActionStatus({{ $action->id }}, '{{ $action->status->value === 'done' ? 'open' : 'done' }}')"
+                                                    class="flex-shrink-0 {{ $action->status->value === 'done' ? 'text-[rgb(var(--ui-success-rgb))]' : 'text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-success-rgb))]' }} transition-colors">
+                                                @svg($action->status->value === 'done' ? 'heroicon-s-check-circle' : 'heroicon-o-circle-stack', 'w-5 h-5')
+                                            </button>
+                                            <div class="flex-1 min-w-0">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-sm font-medium {{ $action->status->value === 'done' ? 'line-through opacity-60' : '' }}">{{ $action->title }}</span>
+                                                    <x-ui-badge :color="$action->status->color()" size="xs">{{ $action->status->label() }}</x-ui-badge>
+                                                </div>
+                                                <div class="flex items-center gap-3 text-xs text-[color:var(--ui-secondary)] mt-0.5">
+                                                    @if($action->responsible)
+                                                        <span>@svg('heroicon-o-user', 'w-3 h-3 inline-block') {{ $action->responsible }}</span>
+                                                    @endif
+                                                    @if($action->due_date)
+                                                        <span class="{{ $action->due_date->isPast() && !in_array($action->status->value, ['done', 'cancelled']) ? 'text-[rgb(var(--ui-danger-rgb))] font-medium' : '' }}">
+                                                            @svg('heroicon-o-calendar', 'w-3 h-3 inline-block') {{ $action->due_date->format('d.m.Y') }}
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center gap-1">
+                                                <button wire:click="editAction({{ $action->id }})" class="text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-primary-rgb))] transition-colors">
+                                                    @svg('heroicon-o-pencil', 'w-4 h-4')
+                                                </button>
+                                                <button wire:click="deleteAction({{ $action->id }})" wire:confirm="Massnahme wirklich löschen?" class="text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-danger-rgb))] transition-colors">
+                                                    @svg('heroicon-o-trash', 'w-4 h-4')
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 </div>
                             </div>
                         @endforeach
