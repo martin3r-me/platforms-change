@@ -111,6 +111,57 @@ enum ChangePhaseNumber: int
         };
     }
 
+    /**
+     * Praxis-Tipp: Was in dieser Phase am wichtigsten ist.
+     */
+    public function tip(): string
+    {
+        return match ($this) {
+            self::URGENCY => 'Zeigen Sie Daten und Fakten — nicht Meinungen. Eine echte Krise oder verpasste Chance wirkt staerker als jede Praesentation.',
+            self::COALITION => 'Mischen Sie Hierarchie-Ebenen. Die Koalition braucht sowohl Entscheider als auch informelle Meinungsfuehrer aus dem Team.',
+            self::VISION => 'Die Vision muss in 5 Minuten erklaerbar sein. Wenn sie laenger braucht, ist sie zu komplex.',
+            self::VOLUNTEERS => 'Suchen Sie die 20% Begeisterten (siehe Normalverteilung). Diese ueberzeugen die 60% Unentschlossenen — nicht Sie.',
+            self::BARRIERS => 'Die groessten Hindernisse sind selten technisch. Suchen Sie nach Prozessen, Strukturen und Gewohnheiten, die der Veraenderung widersprechen.',
+            self::SHORT_WINS => 'Waehlen Sie Erfolge, die sichtbar, eindeutig und mit der Vision verknuepft sind. Feiern Sie oeffentlich.',
+            self::SUSTAIN => 'Nach den ersten Erfolgen lauert die groesste Gefahr: Selbstzufriedenheit. Erhoehen Sie das Tempo, nicht verlangsamen.',
+            self::ANCHOR => 'Veraenderung ist erst verankert, wenn sie ueberlebt, auch wenn die Fuehrungskoalition sich zurueckzieht.',
+        };
+    }
+
+    /**
+     * Die zentrale Frage, die in dieser Phase beantwortet werden muss.
+     */
+    public function keyQuestion(): string
+    {
+        return match ($this) {
+            self::URGENCY => 'Was passiert, wenn wir NICHTS veraendern?',
+            self::COALITION => 'Wer hat genug Einfluss UND Glaubwuerdigkeit, um andere mitzuziehen?',
+            self::VISION => 'Wie sieht der Zielzustand konkret aus — und warum lohnt er sich?',
+            self::VOLUNTEERS => 'Wie erreichen wir die 60% Unentschlossenen ueber unsere Begeisterten?',
+            self::BARRIERS => 'Welche Struktur oder Regel steht der Veraenderung im Weg?',
+            self::SHORT_WINS => 'Welchen sichtbaren Erfolg koennen wir in den naechsten 2-4 Wochen erzielen?',
+            self::SUSTAIN => 'Was sind die naechsten drei konkreten Veraenderungen, die auf den Erfolgen aufbauen?',
+            self::ANCHOR => 'Welche Rituale, Prozesse oder Strukturen sichern das neue Verhalten dauerhaft?',
+        };
+    }
+
+    /**
+     * Haeufigster Fehler in dieser Phase.
+     */
+    public function commonMistake(): string
+    {
+        return match ($this) {
+            self::URGENCY => 'Zu wenig Dringlichkeit — das Team denkt, es geht auch ohne Veraenderung.',
+            self::COALITION => 'Nur Manager einbinden, keine informellen Leader.',
+            self::VISION => 'Vision ist zu abstrakt oder zu technisch — keiner kann sie nacherzaehlen.',
+            self::VOLUNTEERS => 'Versuchen, die 20% Gegner zu ueberzeugen statt die 60% Mitte zu gewinnen.',
+            self::BARRIERS => 'Hindernisse ignorieren und hoffen, dass Motivation allein reicht.',
+            self::SHORT_WINS => 'Zu grosse Ziele setzen — der erste Erfolg kommt zu spaet.',
+            self::SUSTAIN => 'Nach dem ersten Erfolg den Sieg erklaeren und nachlassen.',
+            self::ANCHOR => 'Neue Prozesse einfuehren, aber alte nicht abschaffen.',
+        };
+    }
+
     public function needsDarkText(): bool
     {
         return match ($this) {

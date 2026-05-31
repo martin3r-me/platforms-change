@@ -75,6 +75,26 @@
         </div>
     </div>
 
+    {{-- Mini-Info (Kernfrage + Tipp, collapsible) --}}
+    <div x-data="{ showInfo: false }" class="relative z-10 mb-1.5">
+        <button @click="showInfo = !showInfo" class="text-[10px] flex items-center gap-1 transition-colors"
+                style="color: {{ $phaseColor }}; opacity: 0.6;"
+                onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
+            @svg('heroicon-o-light-bulb', 'w-3 h-3')
+            <span x-text="showInfo ? 'Tipp ausblenden' : 'Tipp anzeigen'"></span>
+        </button>
+        <div x-show="showInfo" x-collapse x-cloak class="mt-1.5 space-y-1.5">
+            <div class="rounded px-2 py-1.5 text-[10px] leading-relaxed" style="background: {{ $phaseColor }}08; border-left: 2px solid {{ $phaseColor }}40;">
+                <span class="font-semibold" style="color: {{ $phaseColor }};">Kernfrage:</span>
+                <span class="text-[color:var(--ui-secondary)]">{{ $phase->phase_number->keyQuestion() }}</span>
+            </div>
+            <div class="rounded px-2 py-1.5 text-[10px] leading-relaxed" style="background: {{ $phaseColor }}08; border-left: 2px solid {{ $phaseColor }}40;">
+                <span class="font-semibold" style="color: {{ $phaseColor }};">Tipp:</span>
+                <span class="text-[color:var(--ui-secondary)]">{{ $phase->phase_number->tip() }}</span>
+            </div>
+        </div>
+    </div>
+
     {{-- Inline edit form --}}
     @if($editingPhaseId === $phase->id)
         <div class="space-y-2.5 border-t border-black/5 pt-2.5 relative z-10" x-data="{ status: @entangle('phaseForm.status') }">

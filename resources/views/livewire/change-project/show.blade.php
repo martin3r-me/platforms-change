@@ -308,6 +308,31 @@
             </div>
 
             {{-- ═══════════════════════════════════════════════════════ --}}
+            {{-- CHANGE-WISDOM LEISTE --}}
+            {{-- ═══════════════════════════════════════════════════════ --}}
+            <div class="mb-6 flex items-center gap-3 rounded-lg bg-black/[0.02] border border-black/5 px-4 py-2.5 text-[11px] text-[color:var(--ui-secondary)]"
+                 x-data="{
+                    tips: [
+                        '70% aller Change-Projekte scheitern — meist an mangelnder Dringlichkeit und fehlender Koalition (Kotter, 1996).',
+                        'Die 20/60/20-Regel: Gewinnen Sie die 60% Unentschlossenen ueber Ihre 20% Begeisterten.',
+                        'Menschen widersetzen sich nicht der Veraenderung — sie widersetzen sich dem Veraendert-werden (Peter Senge).',
+                        'Quick Wins sind kein Nice-to-have. Ohne fruehe Erfolge verliert jede Veraenderung an Glaubwuerdigkeit.',
+                        'Kultur laesst sich nicht per Dekret aendern. Sie aendert sich durch neue Gewohnheiten und Erlebnisse.',
+                        'Der groesste Fehler: Nach dem ersten Erfolg den Sieg erklaeren. Veraenderung braucht Ausdauer.',
+                        'Widerstand ist ein Signal, kein Problem. Er zeigt, wo echte Anpassung noetig ist.',
+                        'Eine Vision, die nicht in einem Satz erklaerbar ist, wird nie gelebt werden.'
+                    ],
+                    current: 0,
+                    init() { this.current = Math.floor(Math.random() * this.tips.length); }
+                 }">
+                @svg('heroicon-o-academic-cap', 'w-4 h-4 text-[color:var(--ui-muted)] flex-shrink-0')
+                <p class="flex-1 leading-relaxed" x-text="tips[current]"></p>
+                <button @click="current = (current + 1) % tips.length" class="flex-shrink-0 text-[color:var(--ui-muted)] hover:text-[color:var(--ui-secondary)] transition-colors" title="Naechster Tipp">
+                    @svg('heroicon-o-arrow-path', 'w-3.5 h-3.5')
+                </button>
+            </div>
+
+            {{-- ═══════════════════════════════════════════════════════ --}}
             {{-- ACTIVE PHASE SPOTLIGHT --}}
             {{-- ═══════════════════════════════════════════════════════ --}}
             @php
@@ -573,6 +598,69 @@
         {{-- TAB: STAKEHOLDER --}}
         {{-- ═══════════════════════════════════════════════════════════ --}}
         @elseif($activeTab === 'stakeholder')
+
+            {{-- 20/60/20 Verteilungs-Karte --}}
+            <div class="mb-6 rounded-xl border border-black/5 bg-white/60 backdrop-blur-sm p-5" x-data="{ expanded: false }">
+                <div class="flex items-start gap-4">
+                    {{-- Gauss-Kurve Visual --}}
+                    <div class="flex-shrink-0 hidden sm:block">
+                        <svg width="180" height="80" viewBox="0 0 180 80" class="opacity-90">
+                            {{-- Gaussian curve --}}
+                            <defs>
+                                <linearGradient id="gaussGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#EF4444;stop-opacity:0.15"/>
+                                    <stop offset="20%" style="stop-color:#EF4444;stop-opacity:0.15"/>
+                                    <stop offset="20%" style="stop-color:#94A3B8;stop-opacity:0.10"/>
+                                    <stop offset="80%" style="stop-color:#94A3B8;stop-opacity:0.10"/>
+                                    <stop offset="80%" style="stop-color:#22C55E;stop-opacity:0.15"/>
+                                    <stop offset="100%" style="stop-color:#22C55E;stop-opacity:0.15"/>
+                                </linearGradient>
+                            </defs>
+                            {{-- Fill under curve --}}
+                            <path d="M5,75 C5,75 20,72 36,65 C52,45 65,15 90,8 C115,15 128,45 144,65 C160,72 175,75 175,75 L175,78 L5,78 Z"
+                                  fill="url(#gaussGrad)"/>
+                            {{-- Curve line --}}
+                            <path d="M5,75 C5,75 20,72 36,65 C52,45 65,15 90,8 C115,15 128,45 144,65 C160,72 175,75 175,75"
+                                  fill="none" stroke="#64748B" stroke-width="1.5" opacity="0.4"/>
+                            {{-- Zone separators --}}
+                            <line x1="36" y1="5" x2="36" y2="78" stroke="#94A3B8" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.5"/>
+                            <line x1="144" y1="5" x2="144" y2="78" stroke="#94A3B8" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.5"/>
+                            {{-- Zone labels --}}
+                            <text x="18" y="70" text-anchor="middle" fill="#EF4444" font-size="11" font-weight="700" font-family="'JetBrains Mono', monospace">20%</text>
+                            <text x="90" y="40" text-anchor="middle" fill="#64748B" font-size="11" font-weight="700" font-family="'JetBrains Mono', monospace">60%</text>
+                            <text x="160" y="70" text-anchor="middle" fill="#22C55E" font-size="11" font-weight="700" font-family="'JetBrains Mono', monospace">20%</text>
+                        </svg>
+                    </div>
+                    {{-- Text --}}
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-xs font-bold text-[color:var(--ui-text)] mb-1" style="font-family: 'JetBrains Mono', monospace;">Die 20 / 60 / 20 Regel</h3>
+                        <p class="text-[11px] text-[color:var(--ui-secondary)] leading-relaxed">
+                            Bei jeder Veraenderung verteilen sich Menschen gemaess der Normalverteilung:
+                            <span class="font-medium text-[#22C55E]">20% sind dafuer</span>,
+                            <span class="font-medium text-[#64748B]">60% sind abwartend</span>,
+                            <span class="font-medium text-[#EF4444]">20% sind dagegen</span>.
+                        </p>
+                        <button @click="expanded = !expanded" class="text-[10px] mt-1.5 font-medium text-[rgb(var(--ui-primary-rgb))] hover:underline">
+                            <span x-text="expanded ? 'Weniger anzeigen' : 'Strategie-Tipps anzeigen'"></span>
+                        </button>
+                        <div x-show="expanded" x-collapse x-cloak class="mt-2 space-y-1.5 text-[11px] text-[color:var(--ui-secondary)] leading-relaxed">
+                            <div class="flex items-start gap-2 rounded p-2 bg-[#22C55E]/5">
+                                <span class="font-bold text-[#22C55E] flex-shrink-0">20% Befuerworter:</span>
+                                <span>Ihre Champions. Staerken und sichtbar machen. Lassen Sie diese die 60% ueberzeugen — Peer-Einfluss wirkt staerker als Top-Down.</span>
+                            </div>
+                            <div class="flex items-start gap-2 rounded p-2 bg-[#64748B]/5">
+                                <span class="font-bold text-[#64748B] flex-shrink-0">60% Abwartende:</span>
+                                <span>Die entscheidende Masse. Brauchen konkrete Beweise (Quick Wins), klare Vorteile und wenig Risiko. Nicht ueberreden — ueberzeugen durch Ergebnisse.</span>
+                            </div>
+                            <div class="flex items-start gap-2 rounded p-2 bg-[#EF4444]/5">
+                                <span class="font-bold text-[#EF4444] flex-shrink-0">20% Skeptiker:</span>
+                                <span>Nicht bekaempfen, aber auch nicht zu viel Energie investieren. Einige werden nie ueberzeugt — das ist normal. Fokus auf die Mitte.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-[color:var(--ui-text)]" style="font-family: 'JetBrains Mono', monospace;">Stakeholder-Map</h2>
                 <x-ui-button variant="primary" size="xs" wire:click="createStakeholder">
