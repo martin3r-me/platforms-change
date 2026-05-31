@@ -204,7 +204,7 @@
     </x-slot>
 
     {{-- Main content (default slot) --}}
-    <x-ui-page-container>
+    <x-ui-page-container class="pt-6">
 
         {{-- ═══════════════════════════════════════════════════════════ --}}
         {{-- TAB: BOARD --}}
