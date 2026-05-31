@@ -4,19 +4,20 @@
     $isInProgress = $phase->status->value === 'in_progress';
     $isCompleted = $phase->status->value === 'completed';
     $isBlocked = $phase->status->value === 'blocked';
+    $isNotStarted = $phase->status->value === 'not_started';
 @endphp
 
-<div class="relative rounded-xl border bg-white/60 backdrop-blur-sm p-3.5 shadow-sm overflow-hidden border-l-[3px] transition-all duration-200
+<div class="relative rounded-xl border bg-white/60 backdrop-blur-sm shadow-sm overflow-hidden border-l-[3px] transition-all duration-200
             {{ $isInProgress ? 'ring-1 ring-offset-1 border-t-[2px]' : '' }}
-            {{ $isCompleted ? 'opacity-75' : '' }}
+            {{ $isCompleted ? 'opacity-80' : '' }}
             {{ $isBlocked ? 'ring-1 ring-[rgb(var(--ui-danger-rgb))]/30' : '' }}
             {{ !$isInProgress && !$isCompleted && !$isBlocked ? 'border-black/5' : '' }}"
      style="border-left-color: {{ $phaseColor }};
             {{ $isInProgress ? 'ring-color: ' . $phaseColor . '40; border-top-color: ' . $phaseColor . '60;' : '' }}">
 
     {{-- Watermark shape (large, background) --}}
-    <div class="absolute -right-3 -bottom-3 opacity-[0.05] pointer-events-none">
-        <svg width="60" height="60" viewBox="0 0 80 80" style="color: {{ $phaseColor }};">
+    <div class="absolute -right-4 -bottom-4 opacity-[0.04] pointer-events-none">
+        <svg width="80" height="80" viewBox="0 0 80 80" style="color: {{ $phaseColor }};">
             @switch($phaseShape)
                 @case('triangle')
                     <polygon points="40,5 75,75 5,75" fill="currentColor"/>
@@ -43,61 +44,119 @@
         </svg>
     </div>
 
-    {{-- Status indicator (top-right) --}}
-    @if($isCompleted)
-        <div class="absolute top-2 right-2">
-            <svg width="16" height="16" viewBox="0 0 20 20" style="color: {{ $phaseColor }};">
-                <circle cx="10" cy="10" r="9" fill="currentColor" opacity="0.15"/>
-                <path d="M6 10l3 3 5-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+    {{-- Phase Header --}}
+    <div class="flex items-start gap-3 p-4 pb-2 relative z-10">
+        {{-- Phase number + shape icon --}}
+        <div class="flex-shrink-0 flex flex-col items-center gap-0.5">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center relative" style="background: {{ $phaseColor }}12;">
+                @if($isCompleted)
+                    <svg width="20" height="20" viewBox="0 0 20 20" style="color: {{ $phaseColor }};">
+                        <path d="M6 10l3 3 5-6" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                @elseif($isInProgress)
+                    <span class="text-lg font-black" style="font-family: 'JetBrains Mono', monospace; color: {{ $phaseColor }};">{{ $phase->phase_number->value }}</span>
+                    <span class="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style="background: {{ $phaseColor }};"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5" style="background: {{ $phaseColor }};"></span>
+                    </span>
+                @elseif($isBlocked)
+                    <span class="text-lg font-black text-[rgb(var(--ui-danger-rgb))]" style="font-family: 'JetBrains Mono', monospace;">{{ $phase->phase_number->value }}</span>
+                @else
+                    <span class="text-lg font-black" style="font-family: 'JetBrains Mono', monospace; color: {{ $phaseColor }}; opacity: 0.4;">{{ $phase->phase_number->value }}</span>
+                @endif
+            </div>
         </div>
-    @elseif($isInProgress)
-        <div class="absolute top-2 right-2">
-            <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style="background: {{ $phaseColor }};"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2" style="background: {{ $phaseColor }};"></span>
-            </span>
+
+        {{-- Title + badge --}}
+        <div class="min-w-0 flex-1">
+            <h3 class="text-sm font-bold leading-tight mb-0.5" style="color: {{ $phaseColor }};">
+                {{ $phase->phase_number->shortLabel() }}
+            </h3>
+            <div class="flex items-center gap-1.5">
+                <x-ui-badge :color="$phase->status->color()" size="xs"
+                            style="background-color: {{ $phaseColor }}12; border-color: {{ $phaseColor }}25;">
+                    {{ $phase->status->label() }}
+                </x-ui-badge>
+                @if($phase->responsible)
+                    <span class="text-[10px] text-[color:var(--ui-secondary)] truncate">
+                        @svg('heroicon-o-user', 'w-2.5 h-2.5 inline-block') {{ $phase->responsible }}
+                    </span>
+                @endif
+            </div>
+        </div>
+
+        {{-- Phase icon --}}
+        <div class="flex-shrink-0 opacity-40">
+            @svg($phase->phase_number->icon(), 'w-5 h-5')
+        </div>
+    </div>
+
+    {{-- Description --}}
+    <div class="px-4 pb-2 relative z-10">
+        <p class="text-[11px] text-[color:var(--ui-secondary)] leading-relaxed line-clamp-2">
+            {{ $phase->phase_number->description() }}
+        </p>
+    </div>
+
+    {{-- Notes (if present) --}}
+    @if($phase->notes && $editingPhaseId !== $phase->id)
+        <div class="mx-4 mb-2 relative z-10">
+            <div class="text-[11px] text-[color:var(--ui-secondary)] bg-black/[0.03] rounded p-2 line-clamp-2 border-l-2" style="border-color: {{ $phaseColor }}30;">
+                {{ $phase->notes }}
+            </div>
         </div>
     @endif
 
-    {{-- Phase header (compact) --}}
-    <div class="flex items-center gap-2 mb-2 relative z-10">
-        <span class="text-2xl font-black leading-none" style="font-family: 'JetBrains Mono', monospace; color: {{ $phaseColor }}; opacity: 0.20;">{{ $phase->phase_number->value }}</span>
-        <div class="min-w-0 flex-1">
-            <h3 class="text-xs font-semibold leading-tight truncate"
-                style="color: {{ $phaseColor }};">
-                {{ $phase->phase_number->shortLabel() }}
-            </h3>
-            <x-ui-badge :color="$phase->status->color()" size="xs" class="mt-0.5"
-                        style="background-color: {{ $phaseColor }}15; border-color: {{ $phaseColor }}30;">
-                {{ $phase->status->label() }}
-            </x-ui-badge>
+    {{-- Actions count --}}
+    @if($phase->actions_count > 0 && $editingPhaseId !== $phase->id)
+        @php
+            $phaseActionsOpen = $phase->actions->whereNotIn('status.value', ['done', 'cancelled'])->count();
+            $phaseActionsDone = $phase->actions->where('status.value', 'done')->count();
+        @endphp
+        <div class="mx-4 mb-2 relative z-10">
+            <div class="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[11px]" style="background: {{ $phaseColor }}08;">
+                @svg('heroicon-o-clipboard-document-list', 'w-3.5 h-3.5 flex-shrink-0')
+                <span class="font-medium" style="color: {{ $phaseColor }};">{{ $phase->actions_count }}</span>
+                <span class="text-[color:var(--ui-secondary)]">Massnahmen</span>
+                @if($phaseActionsDone > 0)
+                    <span class="text-[10px] text-[rgb(var(--ui-success-rgb))]">{{ $phaseActionsDone }} erledigt</span>
+                @endif
+                @if($phaseActionsOpen > 0)
+                    <span class="ml-auto text-[10px] font-medium" style="color: {{ $phaseColor }};">{{ $phaseActionsOpen }} offen</span>
+                @endif
+            </div>
         </div>
-    </div>
+    @endif
 
     {{-- Mini-Info (Kernfrage + Tipp, collapsible) --}}
-    <div x-data="{ showInfo: false }" class="relative z-10 mb-1.5">
-        <button @click="showInfo = !showInfo" class="text-[10px] flex items-center gap-1 transition-colors"
-                style="color: {{ $phaseColor }}; opacity: 0.6;"
-                onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
-            @svg('heroicon-o-light-bulb', 'w-3 h-3')
-            <span x-text="showInfo ? 'Tipp ausblenden' : 'Tipp anzeigen'"></span>
-        </button>
-        <div x-show="showInfo" x-collapse x-cloak class="mt-1.5 space-y-1.5">
-            <div class="rounded px-2 py-1.5 text-[10px] leading-relaxed" style="background: {{ $phaseColor }}08; border-left: 2px solid {{ $phaseColor }}40;">
-                <span class="font-semibold" style="color: {{ $phaseColor }};">Kernfrage:</span>
-                <span class="text-[color:var(--ui-secondary)]">{{ $phase->phase_number->keyQuestion() }}</span>
-            </div>
-            <div class="rounded px-2 py-1.5 text-[10px] leading-relaxed" style="background: {{ $phaseColor }}08; border-left: 2px solid {{ $phaseColor }}40;">
-                <span class="font-semibold" style="color: {{ $phaseColor }};">Tipp:</span>
-                <span class="text-[color:var(--ui-secondary)]">{{ $phase->phase_number->tip() }}</span>
+    @if($editingPhaseId !== $phase->id)
+        <div x-data="{ showInfo: false }" class="px-4 pb-2 relative z-10">
+            <button @click="showInfo = !showInfo" class="text-[10px] flex items-center gap-1 transition-colors"
+                    style="color: {{ $phaseColor }}; opacity: 0.5;"
+                    onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='0.5'">
+                @svg('heroicon-o-light-bulb', 'w-3 h-3')
+                <span x-text="showInfo ? 'Ausblenden' : 'Kernfrage & Tipp'"></span>
+            </button>
+            <div x-show="showInfo" x-collapse x-cloak class="mt-1.5 space-y-1.5">
+                <div class="rounded px-2 py-1.5 text-[10px] leading-relaxed" style="background: {{ $phaseColor }}06; border-left: 2px solid {{ $phaseColor }}30;">
+                    <span class="font-semibold" style="color: {{ $phaseColor }};">Kernfrage:</span>
+                    <span class="text-[color:var(--ui-secondary)]">{{ $phase->phase_number->keyQuestion() }}</span>
+                </div>
+                <div class="rounded px-2 py-1.5 text-[10px] leading-relaxed" style="background: {{ $phaseColor }}06; border-left: 2px solid {{ $phaseColor }}30;">
+                    <span class="font-semibold" style="color: {{ $phaseColor }};">Tipp:</span>
+                    <span class="text-[color:var(--ui-secondary)]">{{ $phase->phase_number->tip() }}</span>
+                </div>
+                <div class="rounded px-2 py-1.5 text-[10px] leading-relaxed bg-[rgb(var(--ui-danger-rgb))]/[0.04]" style="border-left: 2px solid rgb(var(--ui-danger-rgb), 0.3);">
+                    <span class="font-semibold text-[rgb(var(--ui-danger-rgb))]">Fehler:</span>
+                    <span class="text-[color:var(--ui-secondary)]">{{ $phase->phase_number->commonMistake() }}</span>
+                </div>
             </div>
         </div>
-    </div>
+    @endif
 
     {{-- Inline edit form --}}
     @if($editingPhaseId === $phase->id)
-        <div class="space-y-2.5 border-t border-black/5 pt-2.5 relative z-10" x-data="{ status: @entangle('phaseForm.status') }">
+        <div class="space-y-2.5 border-t border-black/5 mx-4 pt-2.5 pb-4 relative z-10" x-data="{ status: @entangle('phaseForm.status') }">
             {{-- Row 1: Status + Responsible --}}
             <div class="grid grid-cols-2 gap-2">
                 <x-ui-input-select
@@ -140,69 +199,50 @@
                 <x-ui-button variant="secondary" size="xs" wire:click="cancelPhaseEdit">Abbrechen</x-ui-button>
             </div>
         </div>
-    @else
-        {{-- Phase details (compact) --}}
-        <div class="relative z-10">
-            @if($phase->responsible)
-                <div class="text-[11px] text-[color:var(--ui-secondary)] mb-1">
-                    @svg('heroicon-o-user', 'w-3 h-3 inline-block')
-                    {{ $phase->responsible }}
-                </div>
-            @endif
-            @if($phase->notes)
-                <div class="text-[11px] text-[color:var(--ui-secondary)] mb-1.5 bg-black/[0.03] rounded p-1.5 line-clamp-2">
-                    {{ $phase->notes }}
-                </div>
-            @endif
+    @endif
 
-            {{-- Actions count --}}
-            @if($phase->actions_count > 0)
-                @php
-                    $phaseActionsOpen = $phase->actions->whereNotIn('status.value', ['done', 'cancelled'])->count();
-                    $phaseActionsDone = $phase->actions->where('status.value', 'done')->count();
-                @endphp
-                <div class="flex items-center gap-2 mb-1.5 rounded-md px-2 py-1 text-[11px]" style="background: {{ $phaseColor }}08;">
-                    @svg('heroicon-o-clipboard-document-list', 'w-3.5 h-3.5 flex-shrink-0')
-                    <span class="font-medium" style="color: {{ $phaseColor }};">{{ $phase->actions_count }}</span>
-                    <span class="text-[color:var(--ui-secondary)]">Massnahmen</span>
-                    @if($phaseActionsDone > 0)
-                        <span class="text-[10px] text-[rgb(var(--ui-success-rgb))]">({{ $phaseActionsDone }} erledigt)</span>
-                    @endif
-                    @if($phaseActionsOpen > 0)
-                        <span class="ml-auto text-[10px] font-medium" style="color: {{ $phaseColor }};">{{ $phaseActionsOpen }} offen</span>
-                    @endif
-                </div>
+    {{-- Quick actions footer --}}
+    @if($editingPhaseId !== $phase->id)
+        <div class="flex items-center gap-1.5 border-t border-black/5 px-4 py-2 relative z-10">
+            <button wire:click="editPhase({{ $phase->id }})"
+                    class="text-xs transition-colors px-1.5 py-0.5 rounded hover:bg-black/5"
+                    style="color: {{ $phaseColor }};">
+                @svg('heroicon-o-pencil', 'w-3.5 h-3.5')
+            </button>
+            <button wire:click="createAction({{ $phase->id }})"
+                    class="text-xs transition-colors px-1.5 py-0.5 rounded hover:bg-black/5"
+                    style="color: {{ $phaseColor }};"
+                    title="Massnahme hinzufuegen">
+                @svg('heroicon-o-plus', 'w-3.5 h-3.5')
+            </button>
+            @if($isNotStarted)
+                <button wire:click="quickUpdatePhaseStatus({{ $phase->id }}, 'in_progress')"
+                        class="ml-auto text-[10px] font-medium transition-colors px-2 py-0.5 rounded hover:bg-black/5 flex items-center gap-1"
+                        style="color: {{ $phaseColor }};"
+                        title="Phase starten">
+                    @svg('heroicon-o-play', 'w-3 h-3')
+                    Starten
+                </button>
+            @elseif($isCompleted)
+                <button wire:click="quickUpdatePhaseStatus({{ $phase->id }}, 'not_started')"
+                        class="ml-auto text-xs text-[rgb(var(--ui-success-rgb))] hover:text-[color:var(--ui-secondary)] transition-colors px-1.5 py-0.5 rounded hover:bg-black/5"
+                        title="Zuruecksetzen auf nicht gestartet">
+                    @svg('heroicon-s-check-circle', 'w-3.5 h-3.5')
+                </button>
+            @elseif($isInProgress)
+                <button wire:click="quickUpdatePhaseStatus({{ $phase->id }}, 'completed')"
+                        class="ml-auto text-[10px] font-medium text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-success-rgb))] transition-colors px-2 py-0.5 rounded hover:bg-black/5 flex items-center gap-1"
+                        title="Als abgeschlossen markieren">
+                    @svg('heroicon-o-check-circle', 'w-3 h-3')
+                    Abschliessen
+                </button>
+            @else
+                <button wire:click="quickUpdatePhaseStatus({{ $phase->id }}, 'completed')"
+                        class="ml-auto text-xs text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-success-rgb))] transition-colors px-1.5 py-0.5 rounded hover:bg-black/5"
+                        title="Als abgeschlossen markieren">
+                    @svg('heroicon-o-check-circle', 'w-3.5 h-3.5')
+                </button>
             @endif
-
-            {{-- Quick actions --}}
-            <div class="flex items-center gap-1 border-t border-black/5 pt-1.5 mt-1.5">
-                <button wire:click="editPhase({{ $phase->id }})"
-                        class="text-xs transition-colors"
-                        style="color: {{ $phaseColor }}; opacity: 0.7;"
-                        onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
-                    @svg('heroicon-o-pencil', 'w-3.5 h-3.5')
-                </button>
-                <button wire:click="createAction({{ $phase->id }})"
-                        class="text-xs transition-colors"
-                        style="color: {{ $phaseColor }}; opacity: 0.7;"
-                        onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'"
-                        title="Maßnahme hinzufügen">
-                    @svg('heroicon-o-plus', 'w-3.5 h-3.5')
-                </button>
-                @if($isCompleted)
-                    <button wire:click="quickUpdatePhaseStatus({{ $phase->id }}, 'not_started')"
-                            class="ml-auto text-xs text-[rgb(var(--ui-success-rgb))] hover:text-[color:var(--ui-secondary)] transition-colors"
-                            title="Zurücksetzen auf nicht gestartet">
-                        @svg('heroicon-s-check-circle', 'w-3.5 h-3.5')
-                    </button>
-                @else
-                    <button wire:click="quickUpdatePhaseStatus({{ $phase->id }}, 'completed')"
-                            class="ml-auto text-xs text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-success-rgb))] transition-colors"
-                            title="Als abgeschlossen markieren">
-                        @svg('heroicon-o-check-circle', 'w-3.5 h-3.5')
-                    </button>
-                @endif
-            </div>
         </div>
     @endif
 </div>

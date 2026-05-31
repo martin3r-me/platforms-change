@@ -459,7 +459,7 @@
                 <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--ui-muted)] flex-shrink-0" style="font-family: 'JetBrains Mono', monospace;">I. Voraussetzungen schaffen</h3>
                 <div class="h-px flex-1 bg-gradient-to-l from-[#E63946]/20 via-[#F4A261]/20 to-transparent"></div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
                 @foreach($this->phases->take(4) as $phase)
                     @include('change::livewire.change-project._phase-card', ['phase' => $phase])
                 @endforeach
@@ -473,7 +473,7 @@
                 <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--ui-muted)] flex-shrink-0" style="font-family: 'JetBrains Mono', monospace;">II. Umsetzen & Verankern</h3>
                 <div class="h-px flex-1 bg-gradient-to-l from-[#2A9D8F]/20 via-[#457B9D]/20 to-transparent"></div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
                 @foreach($this->phases->skip(4) as $phase)
                     @include('change::livewire.change-project._phase-card', ['phase' => $phase])
                 @endforeach
