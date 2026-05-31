@@ -15,26 +15,8 @@ return [
     'guard' => 'web',
 
     'navigation' => [
-        'main' => [
-            'change' => [
-                'title' => 'Change',
-                'icon' => 'heroicon-o-arrows-right-left',
-                'route' => 'change.dashboard',
-            ],
-        ],
-    ],
-
-    'sidebar' => [
-        'change' => [
-            'title' => 'Change',
-            'icon' => 'heroicon-o-arrows-right-left',
-            'items' => [
-                'projects' => [
-                    'title' => 'Change-Projekte',
-                    'route' => 'change.projects.index',
-                    'icon' => 'heroicon-o-rectangle-stack',
-                ],
-            ],
-        ],
+        'route' => 'change.dashboard',
+        'icon'  => 'heroicon-o-arrows-right-left',
+        'order' => 50,
     ],
 ];
