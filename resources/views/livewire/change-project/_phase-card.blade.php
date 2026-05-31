@@ -128,28 +128,12 @@
         </div>
     @endif
 
-    {{-- Mini-Info (Kernfrage + Tipp, collapsible) --}}
+    {{-- Kernfrage (immer sichtbar) --}}
     @if($editingPhaseId !== $phase->id)
-        <div x-data="{ showInfo: false }" class="px-4 pb-2 relative z-10">
-            <button @click="showInfo = !showInfo" class="text-[10px] flex items-center gap-1 transition-colors"
-                    style="color: {{ $phaseColor }}; opacity: 0.5;"
-                    onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='0.5'">
-                @svg('heroicon-o-light-bulb', 'w-3 h-3')
-                <span x-text="showInfo ? 'Ausblenden' : 'Kernfrage & Tipp'"></span>
-            </button>
-            <div x-show="showInfo" x-collapse x-cloak class="mt-1.5 space-y-1.5">
-                <div class="rounded px-2 py-1.5 text-[10px] leading-relaxed" style="background: {{ $phaseColor }}06; border-left: 2px solid {{ $phaseColor }}30;">
-                    <span class="font-semibold" style="color: {{ $phaseColor }};">Kernfrage:</span>
-                    <span class="text-[color:var(--ui-secondary)]">{{ $phase->phase_number->keyQuestion() }}</span>
-                </div>
-                <div class="rounded px-2 py-1.5 text-[10px] leading-relaxed" style="background: {{ $phaseColor }}06; border-left: 2px solid {{ $phaseColor }}30;">
-                    <span class="font-semibold" style="color: {{ $phaseColor }};">Tipp:</span>
-                    <span class="text-[color:var(--ui-secondary)]">{{ $phase->phase_number->tip() }}</span>
-                </div>
-                <div class="rounded px-2 py-1.5 text-[10px] leading-relaxed bg-[rgb(var(--ui-danger-rgb))]/[0.04]" style="border-left: 2px solid rgb(var(--ui-danger-rgb), 0.3);">
-                    <span class="font-semibold text-[rgb(var(--ui-danger-rgb))]">Fehler:</span>
-                    <span class="text-[color:var(--ui-secondary)]">{{ $phase->phase_number->commonMistake() }}</span>
-                </div>
+        <div class="px-4 pb-2 relative z-10">
+            <div class="rounded px-2.5 py-2 text-[11px] leading-relaxed" style="background: {{ $phaseColor }}06; border-left: 2px solid {{ $phaseColor }}30;">
+                <span class="font-semibold" style="color: {{ $phaseColor }};">Kernfrage:</span>
+                <span class="text-[color:var(--ui-secondary)]">{{ $phase->phase_number->keyQuestion() }}</span>
             </div>
         </div>
     @endif
