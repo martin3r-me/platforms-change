@@ -152,45 +152,207 @@
         {{-- ═══════════════════════════════════════════════════════════ --}}
         @if($activeTab === 'board')
 
-            {{-- Bauhaus Header --}}
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--ui-text)]" style="font-family: 'JetBrains Mono', monospace;">KOTTER 8-STEP MODEL</h2>
-                    {{-- 8 mini shapes as progress indicator --}}
-                    <div class="flex items-center gap-1">
-                        @foreach($this->phases as $phase)
+            {{-- ═══════════════════════════════════════════════════════ --}}
+            {{-- PHASE JOURNEY BAR --}}
+            {{-- ═══════════════════════════════════════════════════════ --}}
+            <div class="mb-6">
+                <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--ui-text)] mb-5" style="font-family: 'JetBrains Mono', monospace;">KOTTER 8-STEP MODEL</h2>
+
+                <div class="relative px-4">
+                    {{-- Connection line (background) --}}
+                    <div class="absolute top-[20px] left-[calc(2rem+20px)] right-[calc(2rem+20px)] h-[2px] bg-[#E5E7EB]"></div>
+
+                    {{-- Colored progress line overlay --}}
+                    @php
+                        $lastActiveIndex = -1;
+                        foreach ($this->phases as $idx => $p) {
+                            if (in_array($p->status->value, ['completed', 'in_progress'])) {
+                                $lastActiveIndex = $idx;
+                            }
+                        }
+                        $progressPercent = $lastActiveIndex >= 0 ? ($lastActiveIndex / 7) * 100 : 0;
+                    @endphp
+                    @if($lastActiveIndex >= 0)
+                        <div class="absolute top-[20px] left-[calc(2rem+20px)] h-[2px] transition-all duration-700 ease-out"
+                             style="width: {{ $progressPercent }}%; background: linear-gradient(90deg, #E63946, #F4A261, #E9C46A, #2A9D8F, #457B9D);"></div>
+                    @endif
+
+                    {{-- 8 Phase shapes --}}
+                    <div class="relative flex items-start justify-between">
+                        @foreach($this->phases as $idx => $phase)
                             @php
-                                $miniColor = $phase->status->value === 'not_started' ? '#D1D5DB' : $phase->phase_number->color();
+                                $jColor = $phase->phase_number->color();
+                                $jShape = $phase->phase_number->shape();
+                                $jStatus = $phase->status->value;
+                                $isFilled = in_array($jStatus, ['completed', 'in_progress']);
+                                $isActive = $jStatus === 'in_progress';
+                                $isBlocked = $jStatus === 'blocked';
+                                $fillColor = $isFilled ? $jColor : '#E5E7EB';
+                                $strokeColor = $isBlocked ? '#EF4444' : 'none';
+                                $strokeWidth = $isBlocked ? '2' : '0';
                             @endphp
-                            <svg width="8" height="8" viewBox="0 0 16 16" style="color: {{ $miniColor }};">
-                                @switch($phase->phase_number->shape())
-                                    @case('triangle')
-                                        <polygon points="8,1 15,15 1,15" fill="currentColor"/>
-                                        @break
-                                    @case('diamond')
-                                        <polygon points="8,1 15,8 8,15 1,8" fill="currentColor"/>
-                                        @break
-                                    @case('circle')
-                                        <circle cx="8" cy="8" r="7" fill="currentColor"/>
-                                        @break
-                                    @case('square')
-                                        <rect x="1" y="1" width="14" height="14" fill="currentColor"/>
-                                        @break
-                                    @case('hexagon')
-                                        <polygon points="8,1 14,4 14,12 8,15 2,12 2,4" fill="currentColor"/>
-                                        @break
-                                    @case('pentagon')
-                                        <polygon points="8,1 15,6 12,15 4,15 1,6" fill="currentColor"/>
-                                        @break
-                                    @case('octagon')
-                                        <polygon points="5,1 11,1 15,5 15,11 11,15 5,15 1,11 1,5" fill="currentColor"/>
-                                        @break
-                                @endswitch
-                            </svg>
+                            <div class="flex flex-col items-center" style="width: 60px;">
+                                {{-- Shape container with optional glow --}}
+                                <div class="relative flex items-center justify-center w-[40px] h-[40px] {{ $isActive ? 'animate-pulse' : '' }}">
+                                    @if($isActive)
+                                        {{-- Glow ring for active phase --}}
+                                        <div class="absolute inset-[-4px] rounded-full opacity-30 animate-ping" style="background: {{ $jColor }}; animation-duration: 2s;"></div>
+                                        <div class="absolute inset-[-3px] rounded-full opacity-20" style="background: {{ $jColor }};"></div>
+                                    @endif
+                                    <svg width="40" height="40" viewBox="0 0 40 40" class="relative z-10">
+                                        @switch($jShape)
+                                            @case('triangle')
+                                                <polygon points="20,3 37,37 3,37" fill="{{ $fillColor }}" stroke="{{ $strokeColor }}" stroke-width="{{ $strokeWidth }}"/>
+                                                @break
+                                            @case('diamond')
+                                                <polygon points="20,3 37,20 20,37 3,20" fill="{{ $fillColor }}" stroke="{{ $strokeColor }}" stroke-width="{{ $strokeWidth }}"/>
+                                                @break
+                                            @case('circle')
+                                                <circle cx="20" cy="20" r="17" fill="{{ $fillColor }}" stroke="{{ $strokeColor }}" stroke-width="{{ $strokeWidth }}"/>
+                                                @break
+                                            @case('square')
+                                                <rect x="3" y="3" width="34" height="34" fill="{{ $fillColor }}" stroke="{{ $strokeColor }}" stroke-width="{{ $strokeWidth }}"/>
+                                                @break
+                                            @case('hexagon')
+                                                <polygon points="20,3 35,11 35,29 20,37 5,29 5,11" fill="{{ $fillColor }}" stroke="{{ $strokeColor }}" stroke-width="{{ $strokeWidth }}"/>
+                                                @break
+                                            @case('pentagon')
+                                                <polygon points="20,3 37,15 30,37 10,37 3,15" fill="{{ $fillColor }}" stroke="{{ $strokeColor }}" stroke-width="{{ $strokeWidth }}"/>
+                                                @break
+                                            @case('octagon')
+                                                <polygon points="13,3 27,3 37,13 37,27 27,37 13,37 3,27 3,13" fill="{{ $fillColor }}" stroke="{{ $strokeColor }}" stroke-width="{{ $strokeWidth }}"/>
+                                                @break
+                                        @endswitch
+                                        {{-- Checkmark for completed --}}
+                                        @if($jStatus === 'completed')
+                                            <path d="M14 20l4 4 8-8" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                        @endif
+                                        {{-- Phase number inside shape (not completed) --}}
+                                        @if($jStatus !== 'completed')
+                                            <text x="20" y="20" text-anchor="middle" dominant-baseline="central"
+                                                  fill="{{ $isFilled ? 'white' : '#9CA3AF' }}"
+                                                  font-size="13" font-weight="700" font-family="'JetBrains Mono', monospace">{{ $phase->phase_number->value }}</text>
+                                        @endif
+                                    </svg>
+                                </div>
+                                {{-- Phase number + short label --}}
+                                <span class="mt-1.5 text-[10px] font-bold {{ $isFilled ? 'text-[color:var(--ui-text)]' : 'text-[color:var(--ui-muted)]' }}"
+                                      style="font-family: 'JetBrains Mono', monospace;">{{ $phase->phase_number->value }}</span>
+                                <span class="text-[9px] text-center leading-tight {{ $isFilled ? 'text-[color:var(--ui-secondary)]' : 'text-[color:var(--ui-muted)]' }} max-w-[60px] truncate">
+                                    {{ $phase->phase_number->shortLabel() }}
+                                </span>
+                            </div>
                         @endforeach
                     </div>
                 </div>
             </div>
+
+            {{-- ═══════════════════════════════════════════════════════ --}}
+            {{-- ACTIVE PHASE SPOTLIGHT --}}
+            {{-- ═══════════════════════════════════════════════════════ --}}
+            @php
+                $activePhase = $this->phases->firstWhere('status.value', 'in_progress');
+            @endphp
+
+            @if($activePhase)
+                @php
+                    $spotColor = $activePhase->phase_number->color();
+                    $spotShape = $activePhase->phase_number->shape();
+                    $phaseActions = $activePhase->actions ?? collect();
+                    $openActions = $phaseActions->whereNotIn('status.value', ['done', 'cancelled'])->count();
+                    $doneActions = $phaseActions->where('status.value', 'done')->count();
+                @endphp
+                <div class="mb-8 rounded-xl border border-black/5 p-5 relative overflow-hidden"
+                     style="background: {{ $spotColor }}10;">
+                    {{-- Watermark shape --}}
+                    <div class="absolute -right-6 -bottom-6 opacity-[0.06] pointer-events-none">
+                        <svg width="140" height="140" viewBox="0 0 80 80" style="color: {{ $spotColor }};">
+                            @switch($spotShape)
+                                @case('triangle')
+                                    <polygon points="40,5 75,75 5,75" fill="currentColor"/>
+                                    @break
+                                @case('diamond')
+                                    <polygon points="40,5 75,40 40,75 5,40" fill="currentColor"/>
+                                    @break
+                                @case('circle')
+                                    <circle cx="40" cy="40" r="35" fill="currentColor"/>
+                                    @break
+                                @case('square')
+                                    <rect x="5" y="5" width="70" height="70" fill="currentColor"/>
+                                    @break
+                                @case('hexagon')
+                                    <polygon points="40,5 70,20 70,60 40,75 10,60 10,20" fill="currentColor"/>
+                                    @break
+                                @case('pentagon')
+                                    <polygon points="40,5 75,30 60,75 20,75 5,30" fill="currentColor"/>
+                                    @break
+                                @case('octagon')
+                                    <polygon points="25,5 55,5 75,25 75,55 55,75 25,75 5,55 5,25" fill="currentColor"/>
+                                    @break
+                            @endswitch
+                        </svg>
+                    </div>
+
+                    <div class="flex items-start gap-6 relative z-10">
+                        {{-- Left: Big phase number --}}
+                        <div class="flex-shrink-0 hidden sm:block">
+                            <span class="text-6xl font-black leading-none" style="font-family: 'JetBrains Mono', monospace; color: {{ $spotColor }}; opacity: 0.10;">
+                                {{ $activePhase->phase_number->value }}
+                            </span>
+                        </div>
+
+                        {{-- Center: Phase info --}}
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <x-ui-badge size="xs" color="primary">In Bearbeitung</x-ui-badge>
+                            </div>
+                            <h3 class="text-lg font-bold text-[color:var(--ui-text)] mb-1" style="color: {{ $spotColor }};">
+                                {{ $activePhase->phase_number->label() }}
+                            </h3>
+                            <p class="text-xs text-[color:var(--ui-secondary)] mb-2 line-clamp-2">
+                                {{ $activePhase->phase_number->description() }}
+                            </p>
+                            @if($activePhase->responsible)
+                                <div class="text-xs text-[color:var(--ui-secondary)]">
+                                    @svg('heroicon-o-user', 'w-3 h-3 inline-block')
+                                    {{ $activePhase->responsible }}
+                                </div>
+                            @endif
+                        </div>
+
+                        {{-- Right: Quick stats + CTA --}}
+                        <div class="flex-shrink-0 text-right space-y-2">
+                            <div class="flex items-center gap-4 text-xs">
+                                <div>
+                                    <span class="block text-lg font-bold" style="font-family: 'JetBrains Mono', monospace; color: {{ $spotColor }};">{{ $openActions }}</span>
+                                    <span class="text-[color:var(--ui-secondary)]">offen</span>
+                                </div>
+                                <div>
+                                    <span class="block text-lg font-bold" style="font-family: 'JetBrains Mono', monospace; color: {{ $spotColor }};">{{ $doneActions }}</span>
+                                    <span class="text-[color:var(--ui-secondary)]">erledigt</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-1.5">
+                                <x-ui-button variant="secondary" size="xs" wire:click="editPhase({{ $activePhase->id }})">
+                                    @svg('heroicon-o-pencil', 'w-3 h-3')
+                                </x-ui-button>
+                                <x-ui-button variant="primary" size="xs" wire:click="createAction({{ $activePhase->id }})">
+                                    @svg('heroicon-o-plus', 'w-3 h-3')
+                                    Maßnahme
+                                </x-ui-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @else
+                {{-- No active phase banner --}}
+                <div class="mb-8 rounded-xl border border-dashed border-black/10 bg-white/40 p-4 text-center">
+                    <p class="text-xs text-[color:var(--ui-secondary)]">
+                        @svg('heroicon-o-information-circle', 'w-4 h-4 inline-block mb-0.5')
+                        Keine Phase in Bearbeitung &mdash; starten Sie mit Phase 1
+                    </p>
+                </div>
+            @endif
 
             {{-- Stage I: Voraussetzungen schaffen (Phases 1-4, warm colors) --}}
             <div class="mb-2">

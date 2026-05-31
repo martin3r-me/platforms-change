@@ -71,10 +71,50 @@
 
                         {{-- Bauhaus 8-segment progress indicator --}}
                         <div class="mb-3">
-                            <div class="flex items-center justify-between text-xs mb-1.5">
-                                <span class="font-bold uppercase tracking-[0.1em] text-[10px] text-[color:var(--ui-secondary)]" style="font-family: 'JetBrains Mono', monospace;">Fortschritt</span>
-                                <span class="text-[color:var(--ui-secondary)]" style="font-family: 'JetBrains Mono', monospace;">{{ $project->completed_phases_count }}/{{ $project->phases_count }}</span>
+                            {{-- Mini Bauhaus Shapes Row --}}
+                            <div class="flex items-center gap-1 mb-2">
+                                @foreach($project->phases->sortBy('phase_number.value') as $phase)
+                                    @php
+                                        $miniStatus = $phase->status->value;
+                                        $miniIsFilled = in_array($miniStatus, ['completed', 'in_progress']);
+                                        $miniColor = $miniIsFilled ? $phase->phase_number->color() : '#D1D5DB';
+                                        $miniIsActive = $miniStatus === 'in_progress';
+                                    @endphp
+                                    <div class="relative">
+                                        <svg width="12" height="12" viewBox="0 0 16 16" style="color: {{ $miniColor }};">
+                                            @switch($phase->phase_number->shape())
+                                                @case('triangle')
+                                                    <polygon points="8,1 15,15 1,15" fill="currentColor"/>
+                                                    @break
+                                                @case('diamond')
+                                                    <polygon points="8,1 15,8 8,15 1,8" fill="currentColor"/>
+                                                    @break
+                                                @case('circle')
+                                                    <circle cx="8" cy="8" r="7" fill="currentColor"/>
+                                                    @break
+                                                @case('square')
+                                                    <rect x="1" y="1" width="14" height="14" fill="currentColor"/>
+                                                    @break
+                                                @case('hexagon')
+                                                    <polygon points="8,1 14,4 14,12 8,15 2,12 2,4" fill="currentColor"/>
+                                                    @break
+                                                @case('pentagon')
+                                                    <polygon points="8,1 15,6 12,15 4,15 1,6" fill="currentColor"/>
+                                                    @break
+                                                @case('octagon')
+                                                    <polygon points="5,1 11,1 15,5 15,11 11,15 5,15 1,11 1,5" fill="currentColor"/>
+                                                    @break
+                                            @endswitch
+                                        </svg>
+                                        @if($miniIsActive)
+                                            <span class="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full animate-pulse" style="background: {{ $miniColor }};"></span>
+                                        @endif
+                                    </div>
+                                @endforeach
+                                <span class="ml-auto text-[color:var(--ui-secondary)] text-[10px]" style="font-family: 'JetBrains Mono', monospace;">{{ $project->completed_phases_count }}/{{ $project->phases_count }}</span>
                             </div>
+
+                            {{-- Segment progress bar --}}
                             <div class="flex gap-0.5">
                                 @foreach($project->phases->sortBy('phase_number.value') as $phase)
                                     @php
