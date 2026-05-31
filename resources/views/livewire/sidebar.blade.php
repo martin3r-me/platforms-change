@@ -1,58 +1,90 @@
 <div>
-    {{-- Modul Header --}}
-    <x-sidebar-module-header module-name="Change" />
+    <div x-show="!collapsed" class="px-3 pt-3 pb-2 border-b border-[#2C3135] mb-2">
+        <span class="text-[10px] uppercase tracking-widest text-gray-500 font-medium">Change</span>
+    </div>
 
-    {{-- Abschnitt: Allgemein --}}
-    <div>
-        <h4 x-show="!collapsed" class="px-4 py-3 text-xs tracking-wide font-semibold text-gray-400 uppercase">Allgemein</h4>
-
-        {{-- Kotter Guide --}}
-        <a href="{{ route('change.kotter') }}"
-           class="relative flex items-center px-3 py-2 my-1 rounded-md font-medium transition"
-           :class="[
-               window.location.pathname.endsWith('/kotter')
-                   ? 'bg-gray-900 text-white shadow'
-                   : 'text-gray-900 hover:bg-gray-100',
-               collapsed ? 'justify-center' : 'gap-3'
-           ]"
-           wire:navigate>
-            <x-heroicon-o-academic-cap class="w-6 h-6 flex-shrink-0"/>
-            <span x-show="!collapsed" class="truncate">Kotter Guide</span>
+    <div x-show="!collapsed" class="px-2 mb-1">
+        <a href="{{ route('change.projects.index') }}" wire:navigate class="flex items-center gap-2.5 px-3 py-1.5 rounded-md text-[13px] text-gray-300 hover:bg-[#2C3135] hover:text-white transition-colors">
+            @svg('heroicon-o-squares-2x2', 'w-4 h-4')
+            <span>Projekte</span>
         </a>
-
-        {{-- Projekte --}}
-        <a href="{{ route('change.projects.index') }}"
-           class="relative flex items-center px-3 py-2 my-1 rounded-md font-medium transition"
-           :class="[
-               window.location.pathname.includes('/projects')
-                   ? 'bg-gray-900 text-white shadow'
-                   : 'text-gray-900 hover:bg-gray-100',
-               collapsed ? 'justify-center' : 'gap-3'
-           ]"
-           wire:navigate>
-            <x-heroicon-o-rectangle-stack class="w-6 h-6 flex-shrink-0"/>
-            <span x-show="!collapsed" class="truncate">Change-Projekte</span>
+        <a href="{{ route('change.kotter') }}" wire:navigate class="flex items-center gap-2.5 px-3 py-1.5 rounded-md text-[13px] text-gray-300 hover:bg-[#2C3135] hover:text-white transition-colors">
+            @svg('heroicon-o-academic-cap', 'w-4 h-4')
+            <span>Kotter Guide</span>
         </a>
     </div>
 
-    {{-- Abschnitt: Letzte Projekte --}}
-    <div x-show="!collapsed">
-        @if($recentProjects->isNotEmpty())
-            <h4 class="px-4 py-3 text-xs tracking-wide font-semibold text-gray-400 uppercase">Letzte Projekte</h4>
+    {{-- Collapsed View --}}
+    <div x-show="collapsed" class="px-2 py-2 border-b border-[#2C3135]">
+        <div class="flex flex-col gap-2">
+            <a href="{{ route('change.projects.index') }}" wire:navigate class="flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-[#2C3135] transition-colors" title="Projekte">
+                @svg('heroicon-o-squares-2x2', 'w-5 h-5')
+            </a>
+            <a href="{{ route('change.kotter') }}" wire:navigate class="flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-[#2C3135] transition-colors" title="Kotter Guide">
+                @svg('heroicon-o-academic-cap', 'w-5 h-5')
+            </a>
+        </div>
+    </div>
 
-            @foreach($recentProjects as $project)
-                <a href="{{ route('change.projects.show', ['project' => $project]) }}"
-                   class="relative flex items-center px-3 py-2 my-1 rounded-md font-medium transition gap-3"
-                   :class="[
-                       window.location.pathname.endsWith('/projects/{{ $project->id }}')
-                           ? 'bg-gray-900 text-white shadow'
-                           : 'text-gray-900 hover:bg-gray-100'
-                   ]"
-                   wire:navigate>
-                    <x-heroicon-o-arrows-right-left class="w-6 h-6 flex-shrink-0"/>
-                    <span class="truncate">{{ $project->name }}</span>
-                </a>
-            @endforeach
+    {{-- Status-basierte Gruppierung --}}
+    <div x-show="!collapsed" class="mt-2">
+        @foreach($statusGroups as $group)
+            <div x-data="{ open: localStorage.getItem('change.status.{{ $group['status']->value }}') !== 'false' }"
+                 wire:key="status-group-{{ $group['status']->value }}"
+                 class="mb-1">
+                {{-- Status-Header --}}
+                <button type="button"
+                        @click="open = !open; localStorage.setItem('change.status.{{ $group['status']->value }}', open)"
+                        class="flex items-center gap-2 w-full px-3 py-1.5 text-left hover:bg-[#2C3135] rounded-md transition-colors group">
+                    <span class="w-3 h-3 flex-shrink-0 flex items-center justify-center transition-transform text-[var(--ui-muted)]"
+                          :class="open ? 'rotate-90' : ''">
+                        @svg('heroicon-o-chevron-right', 'w-2.5 h-2.5')
+                    </span>
+                    <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[rgb(var(--ui-{{ $group['color'] }}-rgb))]"></span>
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-gray-400 group-hover:text-gray-300 transition-colors">
+                        {{ $group['label'] }}
+                    </span>
+                    <span class="ml-auto text-[10px] tabular-nums text-[var(--ui-muted)] opacity-60">{{ $group['count'] }}</span>
+                </button>
+
+                {{-- Status-Inhalt --}}
+                <div x-show="open" x-collapse class="ml-1">
+                    {{-- Entity-Baum für diesen Status --}}
+                    @foreach($group['linked'] as $typeGroup)
+                        <x-ui-sidebar-list wire:key="status-{{ $group['status']->value }}-type-{{ $typeGroup['type_id'] }}" :label="$typeGroup['type_name']">
+                            @foreach($typeGroup['entities'] as $entityNode)
+                                @include('change::livewire.partials.sidebar-entity-node', [
+                                    'node' => $entityNode,
+                                    'typeIcon' => $typeGroup['type_icon'] ?? null,
+                                ])
+                            @endforeach
+                        </x-ui-sidebar-list>
+                    @endforeach
+
+                    {{-- Unverknüpfte Projekte dieses Status --}}
+                    @if($group['unlinked']->isNotEmpty())
+                        <x-ui-sidebar-list label="Unverknüpft">
+                            @foreach($group['unlinked'] as $project)
+                                <a wire:key="status-{{ $group['status']->value }}-unlinked-{{ $project->id }}"
+                                   href="{{ route('change.projects.show', $project) }}"
+                                   wire:navigate
+                                   title="{{ $project->name }}"
+                                   class="flex items-center gap-1.5 py-0.5 pl-3 pr-2 text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition truncate">
+                                    @svg('heroicon-o-arrows-right-left', 'w-3 h-3 flex-shrink-0 opacity-40')
+                                    <span class="truncate text-[11px]">{{ $project->name }}</span>
+                                </a>
+                            @endforeach
+                        </x-ui-sidebar-list>
+                    @endif
+                </div>
+            </div>
+        @endforeach
+
+        {{-- Leer-Zustand --}}
+        @if($statusGroups->isEmpty())
+            <div class="px-3 py-1 text-xs text-[var(--ui-muted)]">
+                Keine Change-Projekte
+            </div>
         @endif
     </div>
 </div>
