@@ -80,6 +80,17 @@ class Index extends Component
     }
 
     #[Computed]
+    public function recentActivity()
+    {
+        return \Platform\Change\Models\ChangeLog::query()
+            ->where('team_id', Auth::user()->currentTeamRelation?->getRootTeam()?->id)
+            ->with(['project', 'phase', 'user'])
+            ->orderByDesc('created_at')
+            ->take(15)
+            ->get();
+    }
+
+    #[Computed]
     public function availableEntities()
     {
         return OrganizationEntity::where('team_id', Auth::user()->currentTeamRelation?->getRootTeam()?->id)

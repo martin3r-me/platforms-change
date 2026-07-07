@@ -32,6 +32,64 @@
         </x-ui-page-sidebar>
     </x-slot>
 
+    {{-- Activity Sidebar (right) --}}
+    <x-slot name="activity">
+        <x-ui-page-sidebar title="Aktivität" icon="heroicon-o-bolt" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
+            <div class="p-4 space-y-3">
+                <div class="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--ui-muted)]">Letzte Änderungen</div>
+                @forelse($this->recentActivity as $log)
+                    <a href="{{ route('change.projects.show', $log->change_project_id) }}" class="flex gap-2.5 text-xs group">
+                        <div class="flex-shrink-0 mt-0.5">
+                            @if($log->phase)
+                                <svg width="12" height="12" viewBox="0 0 16 16" style="color: {{ $log->phase->phase_number->color() }};">
+                                    @switch($log->phase->phase_number->shape())
+                                        @case('triangle')
+                                            <polygon points="8,1 15,15 1,15" fill="currentColor"/>
+                                            @break
+                                        @case('diamond')
+                                            <polygon points="8,1 15,8 8,15 1,8" fill="currentColor"/>
+                                            @break
+                                        @case('circle')
+                                            <circle cx="8" cy="8" r="7" fill="currentColor"/>
+                                            @break
+                                        @case('square')
+                                            <rect x="1" y="1" width="14" height="14" fill="currentColor"/>
+                                            @break
+                                        @case('hexagon')
+                                            <polygon points="8,1 14,4 14,12 8,15 2,12 2,4" fill="currentColor"/>
+                                            @break
+                                        @case('pentagon')
+                                            <polygon points="8,1 15,6 12,15 4,15 1,6" fill="currentColor"/>
+                                            @break
+                                        @case('octagon')
+                                            <polygon points="5,1 11,1 15,5 15,11 11,15 5,15 1,11 1,5" fill="currentColor"/>
+                                            @break
+                                    @endswitch
+                                </svg>
+                            @else
+                                <div class="w-3 h-3 rounded-full bg-gray-300"></div>
+                            @endif
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-medium text-gray-900 truncate group-hover:text-[rgb(var(--ui-primary-rgb))] transition-colors">{{ $log->title }}</p>
+                            @if($log->project)
+                                <p class="text-[10px] text-gray-400 truncate">{{ $log->project->name }}</p>
+                            @endif
+                            <div class="flex items-center gap-2 text-gray-400 mt-0.5">
+                                <span style="font-family: 'JetBrains Mono', monospace;">{{ $log->created_at->format('d.m. H:i') }}</span>
+                                @if($log->user)
+                                    <span>&middot; {{ $log->user->name }}</span>
+                                @endif
+                            </div>
+                        </div>
+                    </a>
+                @empty
+                    <p class="text-xs text-gray-400 text-center py-4">Noch keine Aktivität.</p>
+                @endforelse
+            </div>
+        </x-ui-page-sidebar>
+    </x-slot>
+
     {{-- Main content (default slot) --}}
     <x-ui-page-container>
         <div class="pt-6">
