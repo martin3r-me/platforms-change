@@ -6,7 +6,7 @@
     <x-slot name="actionbar">
         <x-ui-page-actionbar :breadcrumbs="[['label' => 'Change-Projekte']]">
             <x-slot name="left">
-                <x-ui-input-select
+                <x-nx-input-select
                     wire:key="filter-status"
                     name="statusFilter"
                     :options="['draft' => 'Entwurf', 'active' => 'Aktiv', 'paused' => 'Pausiert', 'completed' => 'Abgeschlossen', 'cancelled' => 'Abgebrochen']"
@@ -17,17 +17,17 @@
                 />
             </x-slot>
 
-            <x-ui-button variant="primary" size="sm" wire:click="create">
+            <x-nx-button variant="primary" size="sm" wire:click="create">
                 @svg('heroicon-o-plus', 'w-4 h-4')
                 <span>Neues Projekt</span>
-            </x-ui-button>
+            </x-nx-button>
         </x-ui-page-actionbar>
     </x-slot>
 
     <x-slot name="sidebar">
         <x-ui-page-sidebar title="Suche" width="w-72" :defaultOpen="true" side="left">
             <div class="p-4">
-                <x-ui-input-text wire:model.live.debounce.300ms="search" placeholder="Name, Code, Beschreibung..." size="sm" />
+                <x-nx-input-text wire:model.live.debounce.300ms="search" placeholder="Name, Code, Beschreibung..." size="sm" />
             </div>
         </x-ui-page-sidebar>
     </x-slot>
@@ -36,7 +36,7 @@
     <x-slot name="activity">
         <x-ui-page-sidebar title="Aktivität" icon="heroicon-o-bolt" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
             <div class="p-4 space-y-3">
-                <div class="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--ui-muted)]">Letzte Änderungen</div>
+                <div class="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--nx-muted)]">Letzte Änderungen</div>
                 @forelse($this->recentActivity as $log)
                     <a href="{{ route('change.projects.show', $log->change_project_id) }}" class="flex gap-2.5 text-xs group">
                         <div class="flex-shrink-0 mt-0.5">
@@ -67,15 +67,15 @@
                                     @endswitch
                                 </svg>
                             @else
-                                <div class="w-3 h-3 rounded-full bg-gray-300"></div>
+                                <div class="w-3 h-3 rounded-full bg-[color:var(--nx-muted)]"></div>
                             @endif
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="font-medium text-gray-900 truncate group-hover:text-[rgb(var(--ui-primary-rgb))] transition-colors">{{ $log->title }}</p>
+                            <p class="font-medium text-[color:var(--nx-text)] truncate group-hover:text-[color:var(--nx-accent)] transition-colors">{{ $log->title }}</p>
                             @if($log->project)
-                                <p class="text-[10px] text-gray-400 truncate">{{ $log->project->name }}</p>
+                                <p class="text-[10px] text-[color:var(--nx-muted)] truncate">{{ $log->project->name }}</p>
                             @endif
-                            <div class="flex items-center gap-2 text-gray-400 mt-0.5">
+                            <div class="flex items-center gap-2 text-[color:var(--nx-muted)] mt-0.5">
                                 <span style="font-family: 'JetBrains Mono', monospace;">{{ $log->created_at->format('d.m. H:i') }}</span>
                                 @if($log->user)
                                     <span>&middot; {{ $log->user->name }}</span>
@@ -84,7 +84,7 @@
                         </div>
                     </a>
                 @empty
-                    <p class="text-xs text-gray-400 text-center py-4">Noch keine Aktivität.</p>
+                    <p class="text-xs text-[color:var(--nx-muted)] text-center py-4">Noch keine Aktivität.</p>
                 @endforelse
             </div>
         </x-ui-page-sidebar>
@@ -95,34 +95,34 @@
         <div class="pt-6">
             @if($this->projects->isEmpty())
                 <div class="flex flex-col items-center justify-center py-16 text-center">
-                    @svg('heroicon-o-arrows-right-left', 'w-12 h-12 text-gray-300 mb-4')
-                    <h3 class="text-sm font-semibold text-gray-900 mb-1">Keine Change-Projekte</h3>
-                    <p class="text-xs text-gray-500 mb-4">Erstellen Sie ein neues Change-Projekt, um den Kotter 8-Stufen-Prozess zu starten.</p>
-                    <x-ui-button variant="primary" size="sm" wire:click="create">
+                    @svg('heroicon-o-arrows-right-left', 'w-12 h-12 text-[color:var(--nx-faint)] mb-4')
+                    <h3 class="text-sm font-semibold text-[color:var(--nx-text)] mb-1">Keine Change-Projekte</h3>
+                    <p class="text-xs text-[color:var(--nx-muted)] mb-4">Erstellen Sie ein neues Change-Projekt, um den Kotter 8-Stufen-Prozess zu starten.</p>
+                    <x-nx-button variant="primary" size="sm" wire:click="create">
                         @svg('heroicon-o-plus', 'w-4 h-4')
                         Neues Projekt
-                    </x-ui-button>
+                    </x-nx-button>
                 </div>
             @else
                 <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach($this->projects as $project)
                         @php
                             $activePhase = $project->phases->firstWhere('status.value', 'in_progress');
-                            $borderColor = $activePhase ? $activePhase->phase_number->color() : '#D1D5DB';
+                            $borderColor = $activePhase ? $activePhase->phase_number->color() : 'var(--nx-line)';
                         @endphp
                         <a href="{{ route('change.projects.show', $project) }}"
-                           class="group block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 border-l-[4px]"
+                           class="group block rounded-2xl border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] p-6 shadow-[var(--nx-shadow-card)] hover:shadow-[var(--nx-shadow-pop)] hover:-translate-y-0.5 transition-all duration-200 border-l-[4px]"
                            style="border-left-color: {{ $borderColor }};">
 
                             {{-- Header --}}
                             <div class="flex items-start justify-between gap-3 mb-1">
                                 <div class="min-w-0">
-                                    <h3 class="font-bold text-sm text-gray-900 truncate group-hover:text-gray-700 transition-colors">{{ $project->name }}</h3>
+                                    <h3 class="font-bold text-sm text-[color:var(--nx-text)] truncate group-hover:text-[color:var(--nx-text)] transition-colors">{{ $project->name }}</h3>
                                     @if($project->code)
-                                        <span class="text-[11px] text-gray-400" style="font-family: 'JetBrains Mono', monospace;">{{ $project->code }}</span>
+                                        <span class="text-[11px] text-[color:var(--nx-muted)]" style="font-family: 'JetBrains Mono', monospace;">{{ $project->code }}</span>
                                     @endif
                                 </div>
-                                <x-ui-badge :color="$project->status->color()" size="xs">{{ $project->status->label() }}</x-ui-badge>
+                                <x-nx-badge :color="$project->status->color()" size="xs">{{ $project->status->label() }}</x-nx-badge>
                             </div>
 
                             {{-- Active Phase Banner --}}
@@ -138,7 +138,7 @@
                             @endif
 
                             @if($project->description)
-                                <p class="text-xs text-gray-500 line-clamp-2 mb-3">{{ $project->description }}</p>
+                                <p class="text-xs text-[color:var(--nx-muted)] line-clamp-2 mb-3">{{ $project->description }}</p>
                             @endif
 
                             {{-- Mini Bauhaus Shapes + Progress --}}
@@ -148,7 +148,7 @@
                                         @php
                                             $miniStatus = $phase->status->value;
                                             $miniIsFilled = in_array($miniStatus, ['completed', 'in_progress']);
-                                            $miniColor = $miniIsFilled ? $phase->phase_number->color() : '#D1D5DB';
+                                            $miniColor = $miniIsFilled ? $phase->phase_number->color() : 'var(--nx-line)';
                                             $miniIsActive = $miniStatus === 'in_progress';
                                         @endphp
                                         <div class="relative">
@@ -182,7 +182,7 @@
                                             @endif
                                         </div>
                                     @endforeach
-                                    <span class="ml-auto text-gray-400 text-[10px] font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $project->completed_phases_count }}/{{ $project->phases_count }}</span>
+                                    <span class="ml-auto text-[color:var(--nx-muted)] text-[10px] font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $project->completed_phases_count }}/{{ $project->phases_count }}</span>
                                 </div>
 
                                 <div class="flex gap-0.5">
@@ -191,7 +191,7 @@
                                             $segColor = match($phase->status->value) {
                                                 'completed' => $phase->phase_number->color(),
                                                 'in_progress' => $phase->phase_number->color() . '80',
-                                                default => '#E5E7EB',
+                                                default => 'var(--nx-line)',
                                             };
                                         @endphp
                                         <div class="flex-1 h-2 rounded-full transition-all duration-500"
@@ -201,7 +201,7 @@
                             </div>
 
                             {{-- Footer --}}
-                            <div class="flex items-center gap-4 text-xs text-gray-400 pt-3 border-t border-gray-100">
+                            <div class="flex items-center gap-4 text-xs text-[color:var(--nx-muted)] pt-3 border-t border-[color:var(--nx-line)]">
                                 <span class="flex items-center gap-1">
                                     @svg('heroicon-o-clipboard-document-list', 'w-3.5 h-3.5')
                                     {{ $project->actions_count }} Maßnahmen
@@ -227,23 +227,23 @@
     </x-ui-page-container>
 
     {{-- Create/Edit Modal --}}
-    <x-ui-modal wire:model="modalShow" :title="$editingId ? 'Projekt bearbeiten' : 'Neues Change-Projekt'">
+    <x-nx-modal wire:model="modalShow" :title="$editingId ? 'Projekt bearbeiten' : 'Neues Change-Projekt'">
         <form wire:submit="store" class="space-y-4">
-            <x-ui-input-text wire:model="form.name" label="Name" required />
-            <x-ui-input-text wire:model="form.code" label="Code" placeholder="z.B. CP-001" />
-            <x-ui-input-textarea wire:model="form.description" label="Beschreibung" rows="3" />
+            <x-nx-input-text wire:model="form.name" label="Name" required />
+            <x-nx-input-text wire:model="form.code" label="Code" placeholder="z.B. CP-001" />
+            <x-nx-input-textarea wire:model="form.description" label="Beschreibung" rows="3" />
 
             <div class="grid grid-cols-2 gap-4">
-                <x-ui-input-select
+                <x-nx-input-select
                     name="form.status"
                     wire:model="form.status"
                     label="Status"
                     :options="['draft' => 'Entwurf', 'active' => 'Aktiv', 'paused' => 'Pausiert', 'completed' => 'Abgeschlossen', 'cancelled' => 'Abgebrochen']"
                 />
-                <x-ui-input-text wire:model="form.target_date" label="Zieldatum" type="date" />
+                <x-nx-input-text wire:model="form.target_date" label="Zieldatum" type="date" />
             </div>
 
-            <x-ui-input-select
+            <x-nx-input-select
                 name="form.owner_entity_id"
                 wire:model="form.owner_entity_id"
                 label="Owner (Organisation)"
@@ -252,15 +252,15 @@
                 nullLabel="Kein Owner"
             />
 
-            <x-ui-input-textarea wire:model="form.urgency_statement" label="Warum ist die Veränderung nötig?" rows="2" />
-            <x-ui-input-textarea wire:model="form.vision_statement" label="Strategische Vision" rows="2" />
+            <x-nx-input-textarea wire:model="form.urgency_statement" label="Warum ist die Veränderung nötig?" rows="2" />
+            <x-nx-input-textarea wire:model="form.vision_statement" label="Strategische Vision" rows="2" />
 
             <div class="flex justify-end gap-2">
-                <x-ui-button variant="secondary" size="sm" wire:click="$set('modalShow', false)" type="button">Abbrechen</x-ui-button>
-                <x-ui-button variant="primary" size="sm" type="submit">
+                <x-nx-button variant="secondary" size="sm" wire:click="$set('modalShow', false)" type="button">Abbrechen</x-nx-button>
+                <x-nx-button variant="primary" size="sm" type="submit">
                     {{ $editingId ? 'Speichern' : 'Erstellen' }}
-                </x-ui-button>
+                </x-nx-button>
             </div>
         </form>
-    </x-ui-modal>
+    </x-nx-modal>
 </x-ui-page>
