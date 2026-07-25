@@ -45,23 +45,23 @@
                         </svg>
                     @endforeach
                 </div>
-                <h1 class="text-3xl font-black text-gray-900 mb-3" style="font-family: 'JetBrains Mono', monospace;">
+                <h1 class="text-3xl font-black text-[color:var(--nx-text)] mb-3" style="font-family: 'JetBrains Mono', monospace;">
                     KOTTER'S 8 STUFEN
                 </h1>
-                <p class="text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                <p class="text-base text-[color:var(--nx-muted)] max-w-2xl mx-auto leading-relaxed">
                     John P. Kotter entwickelte das 8-Stufen-Modell als Antwort auf die Frage, warum 70% aller Transformationen scheitern.
                     Jede Stufe baut auf der vorherigen auf &mdash; keine darf uebersprungen werden.
                 </p>
-                <p class="text-sm text-gray-400 mt-4 italic">
+                <p class="text-sm text-[color:var(--nx-muted)] mt-4 italic">
                     &ldquo;The rate of change is not going to slow down anytime soon. If anything, competition in most industries will probably speed up even more in the next few decades.&rdquo;
                 </p>
-                <p class="text-xs text-gray-400 mt-1">&mdash; John P. Kotter</p>
+                <p class="text-xs text-[color:var(--nx-muted)] mt-1">&mdash; John P. Kotter</p>
             </div>
 
             {{-- Divider --}}
             <div class="flex items-center gap-4">
                 <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-                <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400" style="font-family: 'JetBrains Mono', monospace;">Die 8 Stufen</span>
+                <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--nx-muted)]" style="font-family: 'JetBrains Mono', monospace;">Die 8 Stufen</span>
                 <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
             </div>
 
@@ -101,18 +101,18 @@
                 {{-- Stage divider --}}
                 @if($num === 1)
                     <div class="flex items-center gap-3 mt-4">
-                        <div class="w-8 h-px bg-gray-300"></div>
-                        <span class="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400" style="font-family: 'JetBrains Mono', monospace;">I. Voraussetzungen schaffen</span>
+                        <div class="w-8 h-px bg-[color:var(--nx-muted)]"></div>
+                        <span class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--nx-muted)]" style="font-family: 'JetBrains Mono', monospace;">I. Voraussetzungen schaffen</span>
                     </div>
                 @elseif($num === 5)
                     <div class="flex items-center gap-3 mt-8">
-                        <div class="w-8 h-px bg-gray-300"></div>
-                        <span class="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400" style="font-family: 'JetBrains Mono', monospace;">II. Umsetzen & Verankern</span>
+                        <div class="w-8 h-px bg-[color:var(--nx-muted)]"></div>
+                        <span class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--nx-muted)]" style="font-family: 'JetBrains Mono', monospace;">II. Umsetzen & Verankern</span>
                     </div>
                 @endif
 
                 {{-- Phase Card --}}
-                <div class="relative rounded-2xl border border-gray-200 bg-white p-8 overflow-hidden">
+                <div class="relative rounded-2xl border border-[color:var(--nx-line)] bg-[color:var(--nx-surface)] p-8 overflow-hidden">
                     {{-- Background watermark --}}
                     <div class="absolute -right-8 -top-8 opacity-[0.04] pointer-events-none">
                         <svg width="200" height="200" viewBox="0 0 40 40">
@@ -180,21 +180,21 @@
                             <h2 class="text-xl font-bold mb-1" style="color: {{ $phase->color() }};">
                                 {{ $phase->label() }}
                             </h2>
-                            <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                            <p class="text-sm text-[color:var(--nx-muted)] mb-4 leading-relaxed">
                                 {{ $phase->description() }}
                             </p>
 
                             {{-- Quote --}}
-                            <blockquote class="border-l-[3px] pl-4 mb-4 italic text-sm text-gray-500 leading-relaxed" style="border-color: {{ $phase->color() }}40;">
+                            <blockquote class="border-l-[3px] pl-4 mb-4 italic text-sm text-[color:var(--nx-muted)] leading-relaxed" style="border-color: {{ $phase->color() }}40;">
                                 &ldquo;{{ $kotterQuotes[$num] }}&rdquo;
                             </blockquote>
 
                             {{-- Key principles --}}
                             <div>
-                                <h4 class="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 mb-2" style="font-family: 'JetBrains Mono', monospace;">Kernprinzipien</h4>
+                                <h4 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--nx-muted)] mb-2" style="font-family: 'JetBrains Mono', monospace;">Kernprinzipien</h4>
                                 <ul class="space-y-1.5">
                                     @foreach($kotterPrinciples[$num] as $principle)
-                                        <li class="flex items-start gap-2 text-xs text-gray-600">
+                                        <li class="flex items-start gap-2 text-xs text-[color:var(--nx-muted)]">
                                             <svg width="12" height="12" viewBox="0 0 16 16" class="flex-shrink-0 mt-0.5" style="color: {{ $phase->color() }};">
                                                 @switch($phase->shape())
                                                     @case('triangle')
@@ -231,10 +231,10 @@
             @endforeach
 
             {{-- Footer --}}
-            <div class="text-center py-8 border-t border-gray-200">
-                <p class="text-xs text-gray-400 mb-2">Basierend auf</p>
-                <p class="text-sm font-semibold text-gray-700">&ldquo;Leading Change&rdquo; (1996) &amp; &ldquo;Accelerate&rdquo; (2014)</p>
-                <p class="text-xs text-gray-500 mt-1">von John P. Kotter, Harvard Business School</p>
+            <div class="text-center py-8 border-t border-[color:var(--nx-line)]">
+                <p class="text-xs text-[color:var(--nx-muted)] mb-2">Basierend auf</p>
+                <p class="text-sm font-semibold text-[color:var(--nx-text)]">&ldquo;Leading Change&rdquo; (1996) &amp; &ldquo;Accelerate&rdquo; (2014)</p>
+                <p class="text-xs text-[color:var(--nx-muted)] mt-1">von John P. Kotter, Harvard Business School</p>
             </div>
 
         </div>
