@@ -71,15 +71,16 @@ enum ChangePhaseNumber: int
 
     public function color(): string
     {
+        // 8 Kotter-Phasen auf die zentrale nx-Tone-Palette (gedämpft, kalm)
         return match ($this) {
-            self::URGENCY => '#E63946',
-            self::COALITION => '#E76F51',
-            self::VISION => '#F4D35E',
-            self::VOLUNTEERS => '#A7C957',
-            self::BARRIERS => '#457B9D',
-            self::SHORT_WINS => '#2A9D8F',
-            self::SUSTAIN => '#1D3557',
-            self::ANCHOR => '#264653',
+            self::URGENCY => 'var(--nx-tone-rose)',
+            self::COALITION => 'var(--nx-tone-amber)',
+            self::VISION => 'var(--nx-tone-pink)',
+            self::VOLUNTEERS => 'var(--nx-tone-emerald)',
+            self::BARRIERS => 'var(--nx-tone-sky)',
+            self::SHORT_WINS => 'var(--nx-tone-teal)',
+            self::SUSTAIN => 'var(--nx-tone-indigo)',
+            self::ANCHOR => 'var(--nx-tone-slate)',
         };
     }
 

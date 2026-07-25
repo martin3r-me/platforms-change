@@ -21,19 +21,19 @@
                     @foreach($tabConfig as $tab => $cfg)
                         <button wire:click="$set('activeTab', '{{ $tab }}')"
                                 class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all duration-150
-                                       {{ $activeTab === $tab ? 'bg-[rgb(var(--ui-primary-rgb))]/10 text-[rgb(var(--ui-primary-rgb))]' : 'text-[color:var(--ui-secondary)] hover:bg-black/5' }}">
+                                       {{ $activeTab === $tab ? 'bg-[color:var(--nx-accent)]/10 text-[color:var(--nx-accent)]' : 'text-[color:var(--nx-text)] hover:bg-black/5' }}">
                             @svg($cfg['icon'], 'w-3.5 h-3.5')
                             {{ $cfg['label'] }}
                         </button>
                     @endforeach
                 </div>
                 @if($this->isDirty)
-                    <x-ui-button variant="secondary" size="xs" wire:click="loadForm">Abbrechen</x-ui-button>
-                    <x-ui-button variant="primary" size="xs" wire:click="save">Speichern</x-ui-button>
+                    <x-nx-button variant="secondary" size="xs" wire:click="loadForm">Abbrechen</x-nx-button>
+                    <x-nx-button variant="primary" size="xs" wire:click="save">Speichern</x-nx-button>
                 @endif
             </x-slot>
 
-            <x-ui-badge :color="$project->status->color()" size="sm">{{ $project->status->label() }}</x-ui-badge>
+            <x-nx-badge :variant="$project->status->color()" size="sm">{{ $project->status->label() }}</x-nx-badge>
         </x-ui-page-actionbar>
     </x-slot>
 
@@ -42,7 +42,7 @@
             <div class="p-4 space-y-5">
                 {{-- Progress --}}
                 <div>
-                    <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 mb-3" style="font-family: 'JetBrains Mono', monospace;">Fortschritt</h3>
+                    <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--nx-muted)] mb-3" style="font-family: 'JetBrains Mono', monospace;">Fortschritt</h3>
                     @php
                         $completedPhases = $this->phases->where('status.value', 'completed')->count();
                         $totalPhases = $this->phases->count();
@@ -53,8 +53,8 @@
                     <div class="flex justify-center mb-3">
                         <div class="relative">
                             <svg width="80" height="80" viewBox="0 0 96 96">
-                                <circle cx="48" cy="48" r="36" fill="none" stroke="#E5E7EB" stroke-width="6" />
-                                <circle cx="48" cy="48" r="36" fill="none" stroke="#3B82F6" stroke-width="6"
+                                <circle cx="48" cy="48" r="36" fill="none" stroke="var(--nx-line)" stroke-width="6" />
+                                <circle cx="48" cy="48" r="36" fill="none" stroke="var(--nx-info)" stroke-width="6"
                                         stroke-dasharray="{{ $circumference }}"
                                         stroke-dashoffset="{{ $dashOffset }}"
                                         stroke-linecap="round"
@@ -62,11 +62,11 @@
                                         style="transition: stroke-dashoffset 0.5s ease;" />
                             </svg>
                             <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-base font-bold text-gray-900" style="font-family: 'JetBrains Mono', monospace;">{{ $progress }}%</span>
+                                <span class="text-base font-bold text-[color:var(--nx-text)]" style="font-family: 'JetBrains Mono', monospace;">{{ $progress }}%</span>
                             </div>
                         </div>
                     </div>
-                    <div class="text-center text-xs text-gray-500 mb-3">
+                    <div class="text-center text-xs text-[color:var(--nx-muted)] mb-3">
                         {{ $completedPhases }}/{{ $totalPhases }} Phasen
                     </div>
                     <div class="space-y-1.5">
@@ -74,7 +74,7 @@
                             @php
                                 $phaseColor = $phase->phase_number->color();
                                 $isActive = in_array($phase->status->value, ['completed', 'in_progress']);
-                                $shapeColor = $isActive ? $phaseColor : '#D1D5DB';
+                                $shapeColor = $isActive ? $phaseColor : 'var(--nx-line)';
                             @endphp
                             <div class="flex items-center gap-2.5 text-xs">
                                 <svg width="14" height="14" viewBox="0 0 16 16" style="color: {{ $shapeColor }};">
@@ -117,24 +117,24 @@
                 </div>
 
                 {{-- Key Metrics --}}
-                <div class="border-t border-gray-200 pt-4">
-                    <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 mb-2" style="font-family: 'JetBrains Mono', monospace;">Kennzahlen</h3>
+                <div class="border-t border-[color:var(--nx-line)] pt-4">
+                    <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--nx-muted)] mb-2" style="font-family: 'JetBrains Mono', monospace;">Kennzahlen</h3>
                     <div class="space-y-2 text-xs">
                         <div class="flex justify-between">
-                            <span class="text-gray-500">Massnahmen offen</span>
+                            <span class="text-[color:var(--nx-muted)]">Massnahmen offen</span>
                             <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $this->openActionsCount }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-500">Stakeholder</span>
+                            <span class="text-[color:var(--nx-muted)]">Stakeholder</span>
                             <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $this->stakeholders->count() }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-500">Log-Eintraege</span>
+                            <span class="text-[color:var(--nx-muted)]">Log-Eintraege</span>
                             <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $this->totalLogsCount }}</span>
                         </div>
                         @if($project->plannedEnd())
                             <div class="flex justify-between">
-                                <span class="text-gray-500">Zieldatum</span>
+                                <span class="text-[color:var(--nx-muted)]">Zieldatum</span>
                                 <span class="font-medium" style="font-family: 'JetBrains Mono', monospace;">{{ $project->plannedEnd()->format('d.m.Y') }}</span>
                             </div>
                         @endif
@@ -152,7 +152,7 @@
                     $recentLogs = $this->project->logs()->with(['phase', 'user'])->orderByDesc('created_at')->take(10)->get();
                 @endphp
                 @if($recentLogs->isEmpty())
-                    <p class="text-xs text-gray-400 text-center py-4">Noch keine Log-Eintraege.</p>
+                    <p class="text-xs text-[color:var(--nx-muted)] text-center py-4">Noch keine Log-Eintraege.</p>
                 @else
                     @foreach($recentLogs as $log)
                         <div class="flex gap-2.5 text-xs">
@@ -184,12 +184,12 @@
                                         @endswitch
                                     </svg>
                                 @else
-                                    <div class="w-3 h-3 rounded-full bg-gray-300"></div>
+                                    <div class="w-3 h-3 rounded-full bg-[color:var(--nx-muted)]"></div>
                                 @endif
                             </div>
                             <div class="flex-1 min-w-0">
-                                <p class="font-medium text-gray-900 truncate">{{ $log->title }}</p>
-                                <div class="flex items-center gap-2 text-gray-400 mt-0.5">
+                                <p class="font-medium text-[color:var(--nx-text)] truncate">{{ $log->title }}</p>
+                                <div class="flex items-center gap-2 text-[color:var(--nx-muted)] mt-0.5">
                                     <span style="font-family: 'JetBrains Mono', monospace;">{{ $log->created_at->format('d.m. H:i') }}</span>
                                     @if($log->user)
                                         <span>&middot; {{ $log->user->name }}</span>
@@ -215,8 +215,8 @@
             {{-- ═══════════════════════════════════════════════════════ --}}
             {{-- PHASE JOURNEY BAR (in Card) --}}
             {{-- ═══════════════════════════════════════════════════════ --}}
-            <div class="mb-8 rounded-xl border border-black/5 bg-white/60 backdrop-blur-sm p-5 pb-4">
-                <h2 class="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--ui-muted)] mb-4" style="font-family: 'JetBrains Mono', monospace;">KOTTER 8-STEP MODEL</h2>
+            <div class="mb-8 rounded-xl border border-black/5 bg-[color:var(--nx-surface)]/60 backdrop-blur-sm p-5 pb-4">
+                <h2 class="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--nx-muted)] mb-4" style="font-family: 'JetBrains Mono', monospace;">KOTTER 8-STEP MODEL</h2>
 
                 <div class="relative px-2">
                     {{-- Connection line (background) --}}
@@ -234,7 +234,7 @@
                     @endphp
                     @if($lastActiveIndex >= 0)
                         <div class="absolute top-[20px] left-[calc(1rem+20px)] h-[2px] transition-all duration-700 ease-out"
-                             style="width: {{ $progressPercent }}%; background: linear-gradient(90deg, #E63946, #F4A261, #E9C46A, #2A9D8F, #457B9D);"></div>
+                             style="width: {{ $progressPercent }}%; background: linear-gradient(90deg, var(--nx-tone-rose), var(--nx-warning), var(--nx-warning), var(--nx-tone-teal), var(--nx-tone-sky));"></div>
                     @endif
 
                     {{-- 8 Phase shapes --}}
@@ -247,8 +247,8 @@
                                 $isFilled = in_array($jStatus, ['completed', 'in_progress']);
                                 $isActive = $jStatus === 'in_progress';
                                 $isBlocked = $jStatus === 'blocked';
-                                $fillColor = $isFilled ? $jColor : '#E5E7EB';
-                                $strokeColor = $isBlocked ? '#EF4444' : 'none';
+                                $fillColor = $isFilled ? $jColor : 'var(--nx-line)';
+                                $strokeColor = $isBlocked ? 'var(--nx-danger)' : 'none';
                                 $strokeWidth = $isBlocked ? '2' : '0';
                             @endphp
                             <button wire:click="editPhase({{ $phase->id }})" class="flex flex-col items-center group cursor-pointer" style="width: 60px;" title="{{ $phase->phase_number->label() }}">
@@ -291,13 +291,13 @@
                                         {{-- Phase number inside shape (not completed) --}}
                                         @if($jStatus !== 'completed')
                                             <text x="20" y="20" text-anchor="middle" dominant-baseline="central"
-                                                  fill="{{ $isFilled ? 'white' : '#9CA3AF' }}"
+                                                  fill="{{ $isFilled ? 'white' : 'var(--nx-muted)' }}"
                                                   font-size="13" font-weight="700" font-family="'JetBrains Mono', monospace">{{ $phase->phase_number->value }}</text>
                                         @endif
                                     </svg>
                                 </div>
                                 {{-- Short label only (no redundant number) --}}
-                                <span class="mt-1.5 text-[9px] text-center leading-tight max-w-[60px] truncate font-medium {{ !$isFilled ? 'text-[color:var(--ui-muted)]' : '' }}"
+                                <span class="mt-1.5 text-[9px] text-center leading-tight max-w-[60px] truncate font-medium {{ !$isFilled ? 'text-[color:var(--nx-muted)]' : '' }}"
                                       @if($isFilled) style="color: {{ $jColor }};" @endif>
                                     {{ $phase->phase_number->shortLabel() }}
                                 </span>
@@ -310,7 +310,7 @@
             {{-- ═══════════════════════════════════════════════════════ --}}
             {{-- CHANGE-WISDOM LEISTE --}}
             {{-- ═══════════════════════════════════════════════════════ --}}
-            <div class="mb-6 flex items-center gap-3 rounded-lg bg-black/[0.02] border border-black/5 px-4 py-2.5 text-[11px] text-[color:var(--ui-secondary)]"
+            <div class="mb-6 flex items-center gap-3 rounded-lg bg-black/[0.02] border border-black/5 px-4 py-2.5 text-[11px] text-[color:var(--nx-text)]"
                  x-data="{
                     tips: [
                         '70% aller Change-Projekte scheitern — meist an mangelnder Dringlichkeit und fehlender Koalition (Kotter, 1996).',
@@ -325,9 +325,9 @@
                     current: 0,
                     init() { this.current = Math.floor(Math.random() * this.tips.length); }
                  }">
-                @svg('heroicon-o-academic-cap', 'w-4 h-4 text-[color:var(--ui-muted)] flex-shrink-0')
+                @svg('heroicon-o-academic-cap', 'w-4 h-4 text-[color:var(--nx-muted)] flex-shrink-0')
                 <p class="flex-1 leading-relaxed" x-text="tips[current]"></p>
-                <button @click="current = (current + 1) % tips.length" class="flex-shrink-0 text-[color:var(--ui-muted)] hover:text-[color:var(--ui-secondary)] transition-colors" title="Naechster Tipp">
+                <button @click="current = (current + 1) % tips.length" class="flex-shrink-0 text-[color:var(--nx-muted)] hover:text-[color:var(--nx-text)] transition-colors" title="Naechster Tipp">
                     @svg('heroicon-o-arrow-path', 'w-3.5 h-3.5')
                 </button>
             </div>
@@ -389,16 +389,16 @@
                         {{-- Center: Phase info --}}
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1">
-                                <x-ui-badge size="xs" color="primary">In Bearbeitung</x-ui-badge>
+                                <x-nx-badge size="xs" color="primary">In Bearbeitung</x-nx-badge>
                             </div>
                             <h3 class="text-lg font-bold mb-1" style="color: {{ $spotColor }};">
                                 {{ $activePhase->phase_number->label() }}
                             </h3>
-                            <p class="text-xs text-[color:var(--ui-secondary)] mb-2 line-clamp-2">
+                            <p class="text-xs text-[color:var(--nx-text)] mb-2 line-clamp-2">
                                 {{ $activePhase->phase_number->description() }}
                             </p>
                             @if($activePhase->responsible)
-                                <div class="text-xs text-[color:var(--ui-secondary)]">
+                                <div class="text-xs text-[color:var(--nx-text)]">
                                     @svg('heroicon-o-user', 'w-3 h-3 inline-block')
                                     {{ $activePhase->responsible }}
                                 </div>
@@ -410,21 +410,21 @@
                             <div class="flex items-center gap-4 text-xs">
                                 <div>
                                     <span class="block text-lg font-bold" style="font-family: 'JetBrains Mono', monospace; color: {{ $spotColor }};">{{ $openActions }}</span>
-                                    <span class="text-[color:var(--ui-secondary)]">offen</span>
+                                    <span class="text-[color:var(--nx-text)]">offen</span>
                                 </div>
                                 <div>
                                     <span class="block text-lg font-bold" style="font-family: 'JetBrains Mono', monospace; color: {{ $spotColor }};">{{ $doneActions }}</span>
-                                    <span class="text-[color:var(--ui-secondary)]">erledigt</span>
+                                    <span class="text-[color:var(--nx-text)]">erledigt</span>
                                 </div>
                             </div>
                             <div class="flex gap-1.5">
-                                <x-ui-button variant="secondary" size="xs" wire:click="editPhase({{ $activePhase->id }})">
+                                <x-nx-button variant="secondary" size="xs" wire:click="editPhase({{ $activePhase->id }})">
                                     @svg('heroicon-o-pencil', 'w-3 h-3')
-                                </x-ui-button>
-                                <x-ui-button variant="primary" size="xs" wire:click="createAction({{ $activePhase->id }})">
+                                </x-nx-button>
+                                <x-nx-button variant="primary" size="xs" wire:click="createAction({{ $activePhase->id }})">
                                     @svg('heroicon-o-plus', 'w-3 h-3')
                                     Massnahme
-                                </x-ui-button>
+                                </x-nx-button>
                             </div>
                         </div>
                     </div>
@@ -432,20 +432,20 @@
             @else
                 {{-- No active phase — inviting CTA --}}
                 @php $firstPhase = $this->phases->first(); @endphp
-                <div class="mb-8 rounded-xl border border-dashed border-black/10 bg-white/40 p-6 text-center">
+                <div class="mb-8 rounded-xl border border-dashed border-black/10 bg-[color:var(--nx-surface)]/40 p-6 text-center">
                     <div class="flex flex-col items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-black/[0.04] flex items-center justify-center">
-                            @svg('heroicon-o-play', 'w-5 h-5 text-[color:var(--ui-secondary)]')
+                            @svg('heroicon-o-play', 'w-5 h-5 text-[color:var(--nx-text)]')
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-[color:var(--ui-text)] mb-1">Kein aktiver Schritt</p>
-                            <p class="text-xs text-[color:var(--ui-secondary)]">Starten Sie den Change-Prozess, indem Sie Phase 1 in Bearbeitung setzen.</p>
+                            <p class="text-sm font-medium text-[color:var(--nx-text)] mb-1">Kein aktiver Schritt</p>
+                            <p class="text-xs text-[color:var(--nx-text)]">Starten Sie den Change-Prozess, indem Sie Phase 1 in Bearbeitung setzen.</p>
                         </div>
                         @if($firstPhase && $firstPhase->status->value === 'not_started')
-                            <x-ui-button variant="primary" size="xs" wire:click="quickUpdatePhaseStatus({{ $firstPhase->id }}, 'in_progress')">
+                            <x-nx-button variant="primary" size="xs" wire:click="quickUpdatePhaseStatus({{ $firstPhase->id }}, 'in_progress')">
                                 @svg('heroicon-o-play', 'w-3.5 h-3.5')
                                 Phase 1 starten
-                            </x-ui-button>
+                            </x-nx-button>
                         @endif
                     </div>
                 </div>
@@ -455,9 +455,9 @@
             {{-- STAGE I --}}
             {{-- ═══════════════════════════════════════════════════════ --}}
             <div class="flex items-center gap-2 mb-3">
-                <div class="h-px flex-1 bg-gradient-to-r from-[#E63946]/20 via-[#F4A261]/20 to-transparent"></div>
-                <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--ui-muted)] flex-shrink-0" style="font-family: 'JetBrains Mono', monospace;">I. Voraussetzungen schaffen</h3>
-                <div class="h-px flex-1 bg-gradient-to-l from-[#E63946]/20 via-[#F4A261]/20 to-transparent"></div>
+                <div class="h-px flex-1 bg-gradient-to-r from-[var(--nx-tone-rose)]/20 via-[var(--nx-warning)]/20 to-transparent"></div>
+                <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--nx-muted)] flex-shrink-0" style="font-family: 'JetBrains Mono', monospace;">I. Voraussetzungen schaffen</h3>
+                <div class="h-px flex-1 bg-gradient-to-l from-[var(--nx-tone-rose)]/20 via-[var(--nx-warning)]/20 to-transparent"></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
                 @foreach($this->phases->take(4) as $phase)
@@ -469,9 +469,9 @@
             {{-- STAGE II --}}
             {{-- ═══════════════════════════════════════════════════════ --}}
             <div class="flex items-center gap-2 mb-3">
-                <div class="h-px flex-1 bg-gradient-to-r from-[#2A9D8F]/20 via-[#457B9D]/20 to-transparent"></div>
-                <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--ui-muted)] flex-shrink-0" style="font-family: 'JetBrains Mono', monospace;">II. Umsetzen & Verankern</h3>
-                <div class="h-px flex-1 bg-gradient-to-l from-[#2A9D8F]/20 via-[#457B9D]/20 to-transparent"></div>
+                <div class="h-px flex-1 bg-gradient-to-r from-[var(--nx-tone-teal)]/20 via-[var(--nx-tone-sky)]/20 to-transparent"></div>
+                <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-[color:var(--nx-muted)] flex-shrink-0" style="font-family: 'JetBrains Mono', monospace;">II. Umsetzen & Verankern</h3>
+                <div class="h-px flex-1 bg-gradient-to-l from-[var(--nx-tone-teal)]/20 via-[var(--nx-tone-sky)]/20 to-transparent"></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
                 @foreach($this->phases->skip(4) as $phase)
@@ -482,19 +482,19 @@
             {{-- ═══════════════════════════════════════════════════════ --}}
             {{-- MASSNAHMEN (in Card) --}}
             {{-- ═══════════════════════════════════════════════════════ --}}
-            <div class="rounded-xl border border-black/5 bg-white/60 backdrop-blur-sm p-5">
+            <div class="rounded-xl border border-black/5 bg-[color:var(--nx-surface)]/60 backdrop-blur-sm p-5">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-[rgb(var(--ui-primary-rgb))]/10 flex items-center justify-center">
-                            @svg('heroicon-o-clipboard-document-list', 'w-4 h-4 text-[rgb(var(--ui-primary-rgb))]')
+                        <div class="w-8 h-8 rounded-lg bg-[color:var(--nx-accent)]/10 flex items-center justify-center">
+                            @svg('heroicon-o-clipboard-document-list', 'w-4 h-4 text-[color:var(--nx-accent)]')
                         </div>
                         <div>
-                            <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-[color:var(--ui-text)]" style="font-family: 'JetBrains Mono', monospace;">Alle Massnahmen</h2>
-                            <p class="text-[10px] text-[color:var(--ui-muted)]">{{ $this->actions->count() }} gesamt &middot; {{ $this->openActionsCount }} offen</p>
+                            <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-[color:var(--nx-text)]" style="font-family: 'JetBrains Mono', monospace;">Alle Massnahmen</h2>
+                            <p class="text-[10px] text-[color:var(--nx-muted)]">{{ $this->actions->count() }} gesamt &middot; {{ $this->openActionsCount }} offen</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <x-ui-input-select
+                        <x-nx-input-select
                             name="actionStatusFilter"
                             wire:model.live="actionStatusFilter"
                             :options="['open' => 'Offen', 'in_progress' => 'In Bearbeitung', 'done' => 'Erledigt', 'cancelled' => 'Abgebrochen']"
@@ -502,23 +502,23 @@
                             nullLabel="Alle"
                             size="xs"
                         />
-                        <x-ui-button variant="primary" size="xs" wire:click="createAction">
+                        <x-nx-button variant="primary" size="xs" wire:click="createAction">
                             @svg('heroicon-o-plus', 'w-3.5 h-3.5')
                             Massnahme
-                        </x-ui-button>
+                        </x-nx-button>
                     </div>
                 </div>
 
                 @if($this->actions->isEmpty())
                     <div class="rounded-lg border border-dashed border-black/10 bg-black/[0.02] py-8 text-center">
                         <div class="flex flex-col items-center gap-2">
-                            @svg('heroicon-o-clipboard-document-list', 'w-8 h-8 text-[color:var(--ui-muted)]')
-                            <p class="text-sm text-[color:var(--ui-secondary)]">Noch keine Massnahmen definiert</p>
-                            <p class="text-xs text-[color:var(--ui-muted)]">Massnahmen sind konkrete Aufgaben innerhalb einer Phase.</p>
-                            <x-ui-button variant="secondary" size="xs" wire:click="createAction" class="mt-1">
+                            @svg('heroicon-o-clipboard-document-list', 'w-8 h-8 text-[color:var(--nx-muted)]')
+                            <p class="text-sm text-[color:var(--nx-text)]">Noch keine Massnahmen definiert</p>
+                            <p class="text-xs text-[color:var(--nx-muted)]">Massnahmen sind konkrete Aufgaben innerhalb einer Phase.</p>
+                            <x-nx-button variant="secondary" size="xs" wire:click="createAction" class="mt-1">
                                 @svg('heroicon-o-plus', 'w-3.5 h-3.5')
                                 Erste Massnahme erstellen
-                            </x-ui-button>
+                            </x-nx-button>
                         </div>
                     </div>
                 @else
@@ -530,7 +530,7 @@
                         @foreach($actionsByPhase->sortKeys() as $phaseId => $phaseActions)
                             @php
                                 $groupPhase = $phaseId ? ($phaseMap[$phaseId] ?? null) : null;
-                                $groupColor = $groupPhase ? $groupPhase->phase_number->color() : '#94A3B8';
+                                $groupColor = $groupPhase ? $groupPhase->phase_number->color() : 'var(--nx-muted)';
                                 $groupShape = $groupPhase ? $groupPhase->phase_number->shape() : null;
                                 $groupLabel = $groupPhase ? $groupPhase->phase_number->value . '. ' . $groupPhase->phase_number->shortLabel() : 'Ohne Phase';
                             @endphp
@@ -564,10 +564,10 @@
                                             @endswitch
                                         </svg>
                                     @else
-                                        @svg('heroicon-o-minus-circle', 'w-3.5 h-3.5 text-[color:var(--ui-muted)]')
+                                        @svg('heroicon-o-minus-circle', 'w-3.5 h-3.5 text-[color:var(--nx-muted)]')
                                     @endif
                                     <span class="text-[11px] font-bold uppercase tracking-wider" style="font-family: 'JetBrains Mono', monospace; color: {{ $groupColor }};">{{ $groupLabel }}</span>
-                                    <span class="text-[10px] text-[color:var(--ui-muted)]">{{ $phaseActions->count() }}</span>
+                                    <span class="text-[10px] text-[color:var(--nx-muted)]">{{ $phaseActions->count() }}</span>
                                     <div class="flex-1 h-px" style="background: {{ $groupColor }}20;"></div>
                                     @if($groupPhase)
                                         <button wire:click="createAction({{ $groupPhase->id }})" class="text-[10px] font-medium transition-colors hover:opacity-100 opacity-60" style="color: {{ $groupColor }};">
@@ -579,32 +579,32 @@
                                 {{-- Actions in this phase --}}
                                 <div class="space-y-1.5 ml-1.5 border-l-2 pl-3" style="border-color: {{ $groupColor }}20;">
                                     @foreach($phaseActions as $action)
-                                        <div class="flex items-center gap-3 rounded-lg border border-black/5 bg-white/80 px-3 py-2.5 hover:bg-white transition-colors">
+                                        <div class="flex items-center gap-3 rounded-lg border border-black/5 bg-[color:var(--nx-surface)]/80 px-3 py-2.5 hover:bg-[color:var(--nx-surface)] transition-colors">
                                             <button wire:click="quickUpdateActionStatus({{ $action->id }}, '{{ $action->status->value === 'done' ? 'open' : 'done' }}')"
-                                                    class="flex-shrink-0 {{ $action->status->value === 'done' ? 'text-[rgb(var(--ui-success-rgb))]' : 'text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-success-rgb))]' }} transition-colors">
+                                                    class="flex-shrink-0 {{ $action->status->value === 'done' ? 'text-[color:var(--nx-success)]' : 'text-[color:var(--nx-text)] hover:text-[color:var(--nx-success)]' }} transition-colors">
                                                 @svg($action->status->value === 'done' ? 'heroicon-s-check-circle' : 'heroicon-o-circle-stack', 'w-5 h-5')
                                             </button>
                                             <div class="flex-1 min-w-0">
                                                 <div class="flex items-center gap-2">
                                                     <span class="text-sm font-medium {{ $action->status->value === 'done' ? 'line-through opacity-60' : '' }}">{{ $action->title }}</span>
-                                                    <x-ui-badge :color="$action->status->color()" size="xs">{{ $action->status->label() }}</x-ui-badge>
+                                                    <x-nx-badge :variant="$action->status->color()" size="xs">{{ $action->status->label() }}</x-nx-badge>
                                                 </div>
-                                                <div class="flex items-center gap-3 text-xs text-[color:var(--ui-secondary)] mt-0.5">
+                                                <div class="flex items-center gap-3 text-xs text-[color:var(--nx-text)] mt-0.5">
                                                     @if($action->responsible)
                                                         <span>@svg('heroicon-o-user', 'w-3 h-3 inline-block') {{ $action->responsible }}</span>
                                                     @endif
                                                     @if($action->due_date)
-                                                        <span class="{{ $action->due_date->isPast() && !in_array($action->status->value, ['done', 'cancelled']) ? 'text-[rgb(var(--ui-danger-rgb))] font-medium' : '' }}">
+                                                        <span class="{{ $action->due_date->isPast() && !in_array($action->status->value, ['done', 'cancelled']) ? 'text-[color:var(--nx-danger)] font-medium' : '' }}">
                                                             @svg('heroicon-o-calendar', 'w-3 h-3 inline-block') {{ $action->due_date->format('d.m.Y') }}
                                                         </span>
                                                     @endif
                                                 </div>
                                             </div>
                                             <div class="flex items-center gap-1">
-                                                <button wire:click="editAction({{ $action->id }})" class="text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-primary-rgb))] transition-colors">
+                                                <button wire:click="editAction({{ $action->id }})" class="text-[color:var(--nx-text)] hover:text-[color:var(--nx-accent)] transition-colors">
                                                     @svg('heroicon-o-pencil', 'w-4 h-4')
                                                 </button>
-                                                <button wire:click="deleteAction({{ $action->id }})" wire:confirm="Massnahme wirklich löschen?" class="text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-danger-rgb))] transition-colors">
+                                                <button wire:click="deleteAction({{ $action->id }})" wire:confirm="Massnahme wirklich löschen?" class="text-[color:var(--nx-text)] hover:text-[color:var(--nx-danger)] transition-colors">
                                                     @svg('heroicon-o-trash', 'w-4 h-4')
                                                 </button>
                                             </div>
@@ -624,7 +624,7 @@
         @elseif($activeTab === 'stakeholder')
 
             {{-- 20/60/20 Verteilungs-Karte --}}
-            <div class="mb-6 rounded-xl border border-black/5 bg-white/60 backdrop-blur-sm p-5" x-data="{ expanded: false }">
+            <div class="mb-6 rounded-xl border border-black/5 bg-[color:var(--nx-surface)]/60 backdrop-blur-sm p-5" x-data="{ expanded: false }">
                 <div class="flex items-start gap-4">
                     {{-- Gauss-Kurve Visual --}}
                     <div class="flex-shrink-0 hidden sm:block">
@@ -632,12 +632,12 @@
                             {{-- Gaussian curve --}}
                             <defs>
                                 <linearGradient id="gaussGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" style="stop-color:#EF4444;stop-opacity:0.15"/>
-                                    <stop offset="20%" style="stop-color:#EF4444;stop-opacity:0.15"/>
-                                    <stop offset="20%" style="stop-color:#94A3B8;stop-opacity:0.10"/>
-                                    <stop offset="80%" style="stop-color:#94A3B8;stop-opacity:0.10"/>
-                                    <stop offset="80%" style="stop-color:#22C55E;stop-opacity:0.15"/>
-                                    <stop offset="100%" style="stop-color:#22C55E;stop-opacity:0.15"/>
+                                    <stop offset="0%" style="stop-color:var(--nx-danger);stop-opacity:0.15"/>
+                                    <stop offset="20%" style="stop-color:var(--nx-danger);stop-opacity:0.15"/>
+                                    <stop offset="20%" style="stop-color:var(--nx-muted);stop-opacity:0.10"/>
+                                    <stop offset="80%" style="stop-color:var(--nx-muted);stop-opacity:0.10"/>
+                                    <stop offset="80%" style="stop-color:var(--nx-success);stop-opacity:0.15"/>
+                                    <stop offset="100%" style="stop-color:var(--nx-success);stop-opacity:0.15"/>
                                 </linearGradient>
                             </defs>
                             {{-- Fill under curve --}}
@@ -645,39 +645,39 @@
                                   fill="url(#gaussGrad)"/>
                             {{-- Curve line --}}
                             <path d="M5,75 C5,75 20,72 36,65 C52,45 65,15 90,8 C115,15 128,45 144,65 C160,72 175,75 175,75"
-                                  fill="none" stroke="#64748B" stroke-width="1.5" opacity="0.4"/>
+                                  fill="none" stroke="var(--nx-muted)" stroke-width="1.5" opacity="0.4"/>
                             {{-- Zone separators --}}
-                            <line x1="36" y1="5" x2="36" y2="78" stroke="#94A3B8" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.5"/>
-                            <line x1="144" y1="5" x2="144" y2="78" stroke="#94A3B8" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.5"/>
+                            <line x1="36" y1="5" x2="36" y2="78" stroke="var(--nx-muted)" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.5"/>
+                            <line x1="144" y1="5" x2="144" y2="78" stroke="var(--nx-muted)" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.5"/>
                             {{-- Zone labels --}}
-                            <text x="18" y="70" text-anchor="middle" fill="#EF4444" font-size="11" font-weight="700" font-family="'JetBrains Mono', monospace">20%</text>
-                            <text x="90" y="40" text-anchor="middle" fill="#64748B" font-size="11" font-weight="700" font-family="'JetBrains Mono', monospace">60%</text>
-                            <text x="160" y="70" text-anchor="middle" fill="#22C55E" font-size="11" font-weight="700" font-family="'JetBrains Mono', monospace">20%</text>
+                            <text x="18" y="70" text-anchor="middle" fill="var(--nx-danger)" font-size="11" font-weight="700" font-family="'JetBrains Mono', monospace">20%</text>
+                            <text x="90" y="40" text-anchor="middle" fill="var(--nx-muted)" font-size="11" font-weight="700" font-family="'JetBrains Mono', monospace">60%</text>
+                            <text x="160" y="70" text-anchor="middle" fill="var(--nx-success)" font-size="11" font-weight="700" font-family="'JetBrains Mono', monospace">20%</text>
                         </svg>
                     </div>
                     {{-- Text --}}
                     <div class="flex-1 min-w-0">
-                        <h3 class="text-xs font-bold text-[color:var(--ui-text)] mb-1" style="font-family: 'JetBrains Mono', monospace;">Die 20 / 60 / 20 Regel</h3>
-                        <p class="text-[11px] text-[color:var(--ui-secondary)] leading-relaxed">
+                        <h3 class="text-xs font-bold text-[color:var(--nx-text)] mb-1" style="font-family: 'JetBrains Mono', monospace;">Die 20 / 60 / 20 Regel</h3>
+                        <p class="text-[11px] text-[color:var(--nx-text)] leading-relaxed">
                             Bei jeder Veraenderung verteilen sich Menschen gemaess der Normalverteilung:
-                            <span class="font-medium text-[#22C55E]">20% sind dafuer</span>,
-                            <span class="font-medium text-[#64748B]">60% sind abwartend</span>,
-                            <span class="font-medium text-[#EF4444]">20% sind dagegen</span>.
+                            <span class="font-medium text-[var(--nx-success)]">20% sind dafuer</span>,
+                            <span class="font-medium text-[var(--nx-muted)]">60% sind abwartend</span>,
+                            <span class="font-medium text-[var(--nx-danger)]">20% sind dagegen</span>.
                         </p>
-                        <button @click="expanded = !expanded" class="text-[10px] mt-1.5 font-medium text-[rgb(var(--ui-primary-rgb))] hover:underline">
+                        <button @click="expanded = !expanded" class="text-[10px] mt-1.5 font-medium text-[color:var(--nx-accent)] hover:underline">
                             <span x-text="expanded ? 'Weniger anzeigen' : 'Strategie-Tipps anzeigen'"></span>
                         </button>
-                        <div x-show="expanded" x-collapse x-cloak class="mt-2 space-y-1.5 text-[11px] text-[color:var(--ui-secondary)] leading-relaxed">
-                            <div class="flex items-start gap-2 rounded p-2 bg-[#22C55E]/5">
-                                <span class="font-bold text-[#22C55E] flex-shrink-0">20% Befuerworter:</span>
+                        <div x-show="expanded" x-collapse x-cloak class="mt-2 space-y-1.5 text-[11px] text-[color:var(--nx-text)] leading-relaxed">
+                            <div class="flex items-start gap-2 rounded p-2 bg-[var(--nx-success)]/5">
+                                <span class="font-bold text-[var(--nx-success)] flex-shrink-0">20% Befuerworter:</span>
                                 <span>Ihre Champions. Staerken und sichtbar machen. Lassen Sie diese die 60% ueberzeugen — Peer-Einfluss wirkt staerker als Top-Down.</span>
                             </div>
-                            <div class="flex items-start gap-2 rounded p-2 bg-[#64748B]/5">
-                                <span class="font-bold text-[#64748B] flex-shrink-0">60% Abwartende:</span>
+                            <div class="flex items-start gap-2 rounded p-2 bg-[var(--nx-muted)]/5">
+                                <span class="font-bold text-[var(--nx-muted)] flex-shrink-0">60% Abwartende:</span>
                                 <span>Die entscheidende Masse. Brauchen konkrete Beweise (Quick Wins), klare Vorteile und wenig Risiko. Nicht ueberreden — ueberzeugen durch Ergebnisse.</span>
                             </div>
-                            <div class="flex items-start gap-2 rounded p-2 bg-[#EF4444]/5">
-                                <span class="font-bold text-[#EF4444] flex-shrink-0">20% Skeptiker:</span>
+                            <div class="flex items-start gap-2 rounded p-2 bg-[var(--nx-danger)]/5">
+                                <span class="font-bold text-[var(--nx-danger)] flex-shrink-0">20% Skeptiker:</span>
                                 <span>Nicht bekaempfen, aber auch nicht zu viel Energie investieren. Einige werden nie ueberzeugt — das ist normal. Fokus auf die Mitte.</span>
                             </div>
                         </div>
@@ -686,21 +686,21 @@
             </div>
 
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-[color:var(--ui-text)]" style="font-family: 'JetBrains Mono', monospace;">Stakeholder-Map</h2>
-                <x-ui-button variant="primary" size="xs" wire:click="createStakeholder">
+                <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-[color:var(--nx-text)]" style="font-family: 'JetBrains Mono', monospace;">Stakeholder-Map</h2>
+                <x-nx-button variant="primary" size="xs" wire:click="createStakeholder">
                     @svg('heroicon-o-plus', 'w-3.5 h-3.5')
                     Stakeholder
-                </x-ui-button>
+                </x-nx-button>
             </div>
 
             {{-- Bauhaus Influence/Support Matrix --}}
             @if($this->stakeholders->isNotEmpty())
                 <div class="grid grid-cols-5 gap-px bg-black/5 rounded-lg overflow-hidden mb-6 text-xs">
                     {{-- Header row --}}
-                    <div class="bg-white/80 p-2"></div>
+                    <div class="bg-[color:var(--nx-surface)]/80 p-2"></div>
                     @foreach(\Platform\Change\Enums\StakeholderSupport::cases() as $support)
-                        <div class="bg-white/80 p-2 text-center">
-                            <span class="font-bold uppercase tracking-wider text-[10px] text-[color:var(--ui-secondary)]" style="font-family: 'JetBrains Mono', monospace;">
+                        <div class="bg-[color:var(--nx-surface)]/80 p-2 text-center">
+                            <span class="font-bold uppercase tracking-wider text-[10px] text-[color:var(--nx-text)]" style="font-family: 'JetBrains Mono', monospace;">
                                 {{ $support->label() }}
                             </span>
                         </div>
@@ -708,8 +708,8 @@
 
                     {{-- Matrix rows --}}
                     @foreach(array_reverse(\Platform\Change\Enums\StakeholderInfluence::cases()) as $influence)
-                        <div class="bg-white/80 p-2 flex items-center justify-end pr-3">
-                            <span class="font-bold uppercase tracking-wider text-[10px] text-[color:var(--ui-secondary)]" style="font-family: 'JetBrains Mono', monospace;">
+                        <div class="bg-[color:var(--nx-surface)]/80 p-2 flex items-center justify-end pr-3">
+                            <span class="font-bold uppercase tracking-wider text-[10px] text-[color:var(--nx-text)]" style="font-family: 'JetBrains Mono', monospace;">
                                 {{ $influence->label() }}
                             </span>
                         </div>
@@ -723,11 +723,11 @@
                                 $isHighInfluence = in_array($influence->value, ['high', 'critical']);
                                 $isResistant = in_array($support->value, ['resistant', 'blocker']);
                                 $isChampion = in_array($support->value, ['champion', 'supporter']);
-                                $zoneBg = 'bg-white/60';
+                                $zoneBg = 'bg-[color:var(--nx-surface)]/60';
                                 if ($isHighInfluence && $isResistant) {
-                                    $zoneBg = 'bg-red-50/80';
+                                    $zoneBg = 'bg-[var(--nx-danger)]/10';
                                 } elseif ($isHighInfluence && $isChampion) {
-                                    $zoneBg = 'bg-green-50/80';
+                                    $zoneBg = 'bg-[var(--nx-success)]/10';
                                 }
                             @endphp
                             <div class="{{ $zoneBg }} p-1.5 min-h-[3rem]">
@@ -746,18 +746,18 @@
 
             {{-- Stakeholder list --}}
             @if($this->stakeholders->isEmpty())
-                <p class="text-xs text-[color:var(--ui-secondary)]">Keine Stakeholder erfasst.</p>
+                <p class="text-xs text-[color:var(--nx-text)]">Keine Stakeholder erfasst.</p>
             @else
                 <div class="space-y-2">
                     @foreach($this->stakeholders as $stakeholder)
-                        <div class="flex items-center gap-3 rounded-lg border border-black/5 bg-white/60 backdrop-blur-sm px-4 py-3">
+                        <div class="flex items-center gap-3 rounded-lg border border-black/5 bg-[color:var(--nx-surface)]/60 backdrop-blur-sm px-4 py-3">
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2">
                                     <span class="text-sm font-medium">{{ $stakeholder->name }}</span>
-                                    <x-ui-badge :color="$stakeholder->influence_level->color()" size="xs">{{ $stakeholder->influence_level->label() }}</x-ui-badge>
-                                    <x-ui-badge :color="$stakeholder->support_level->color()" size="xs">{{ $stakeholder->support_level->label() }}</x-ui-badge>
+                                    <x-nx-badge :variant="$stakeholder->influence_level->color()" size="xs">{{ $stakeholder->influence_level->label() }}</x-nx-badge>
+                                    <x-nx-badge :variant="$stakeholder->support_level->color()" size="xs">{{ $stakeholder->support_level->label() }}</x-nx-badge>
                                 </div>
-                                <div class="flex items-center gap-3 text-xs text-[color:var(--ui-secondary)] mt-0.5">
+                                <div class="flex items-center gap-3 text-xs text-[color:var(--nx-text)] mt-0.5">
                                     @if($stakeholder->role)
                                         <span>{{ $stakeholder->role }}</span>
                                     @endif
@@ -767,10 +767,10 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-1">
-                                <button wire:click="editStakeholder({{ $stakeholder->id }})" class="text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-primary-rgb))] transition-colors">
+                                <button wire:click="editStakeholder({{ $stakeholder->id }})" class="text-[color:var(--nx-text)] hover:text-[color:var(--nx-accent)] transition-colors">
                                     @svg('heroicon-o-pencil', 'w-4 h-4')
                                 </button>
-                                <button wire:click="deleteStakeholder({{ $stakeholder->id }})" wire:confirm="Stakeholder wirklich löschen?" class="text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-danger-rgb))] transition-colors">
+                                <button wire:click="deleteStakeholder({{ $stakeholder->id }})" wire:confirm="Stakeholder wirklich löschen?" class="text-[color:var(--nx-text)] hover:text-[color:var(--nx-danger)] transition-colors">
                                     @svg('heroicon-o-trash', 'w-4 h-4')
                                 </button>
                             </div>
@@ -785,9 +785,9 @@
         {{-- ═══════════════════════════════════════════════════════════ --}}
         @elseif($activeTab === 'log')
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-[color:var(--ui-text)]" style="font-family: 'JetBrains Mono', monospace;">Change-Log</h2>
+                <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-[color:var(--nx-text)]" style="font-family: 'JetBrains Mono', monospace;">Change-Log</h2>
                 <div class="flex items-center gap-2">
-                    <x-ui-input-select
+                    <x-nx-input-select
                         name="logTypeFilter"
                         wire:model.live="logTypeFilter"
                         :options="['note' => 'Notiz', 'milestone' => 'Meilenstein', 'decision' => 'Entscheidung', 'risk' => 'Risiko', 'blocker' => 'Blocker']"
@@ -795,7 +795,7 @@
                         nullLabel="Alle Typen"
                         size="xs"
                     />
-                    <x-ui-input-select
+                    <x-nx-input-select
                         name="logPhaseFilter"
                         wire:model.live="logPhaseFilter"
                         :options="$this->phases->pluck('phase_number')->mapWithKeys(fn($p) => [$this->phases->firstWhere('phase_number', $p)->id => 'Phase ' . $p->value . ': ' . $p->shortLabel()])->toArray()"
@@ -803,15 +803,15 @@
                         nullLabel="Alle Phasen"
                         size="xs"
                     />
-                    <x-ui-button variant="primary" size="xs" wire:click="createLog">
+                    <x-nx-button variant="primary" size="xs" wire:click="createLog">
                         @svg('heroicon-o-plus', 'w-3.5 h-3.5')
                         Eintrag
-                    </x-ui-button>
+                    </x-nx-button>
                 </div>
             </div>
 
             @if($this->logs->isEmpty())
-                <p class="text-xs text-[color:var(--ui-secondary)]">Keine Log-Einträge vorhanden.</p>
+                <p class="text-xs text-[color:var(--nx-text)]">Keine Log-Einträge vorhanden.</p>
             @else
                 <div class="space-y-3">
                     @foreach($this->logs as $log)
@@ -845,32 +845,32 @@
                                         @endswitch
                                     </svg>
                                 @else
-                                    <div class="w-3 h-3 rounded-full border-2 border-white bg-[rgb(var(--ui-{{ $log->type->color() }}-rgb))]"></div>
+                                    <div class="w-3 h-3 rounded-full border-2 border-white bg-[color:var(--nx-{{ $log->type->color() }})]"></div>
                                 @endif
                             </div>
 
-                            <div class="rounded-lg border border-black/5 bg-white/60 backdrop-blur-sm p-4">
+                            <div class="rounded-lg border border-black/5 bg-[color:var(--nx-surface)]/60 backdrop-blur-sm p-4">
                                 <div class="flex items-start justify-between gap-2 mb-1">
                                     <div class="flex items-center gap-2">
-                                        @svg($log->type->icon(), 'w-4 h-4 text-[rgb(var(--ui-' . $log->type->color() . '-rgb))]')
+                                        @svg($log->type->icon(), 'w-4 h-4 text-[color:var(--nx-' . $log->type->color() . ')]')
                                         <span class="text-sm font-medium">{{ $log->title }}</span>
-                                        <x-ui-badge :color="$log->type->color()" size="xs">{{ $log->type->label() }}</x-ui-badge>
+                                        <x-nx-badge :variant="$log->type->color()" size="xs">{{ $log->type->label() }}</x-nx-badge>
                                     </div>
                                     <div class="flex items-center gap-1">
-                                        <button wire:click="editLog({{ $log->id }})" class="text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-primary-rgb))] transition-colors">
+                                        <button wire:click="editLog({{ $log->id }})" class="text-[color:var(--nx-text)] hover:text-[color:var(--nx-accent)] transition-colors">
                                             @svg('heroicon-o-pencil', 'w-3.5 h-3.5')
                                         </button>
-                                        <button wire:click="deleteLog({{ $log->id }})" wire:confirm="Eintrag wirklich löschen?" class="text-[color:var(--ui-secondary)] hover:text-[rgb(var(--ui-danger-rgb))] transition-colors">
+                                        <button wire:click="deleteLog({{ $log->id }})" wire:confirm="Eintrag wirklich löschen?" class="text-[color:var(--nx-text)] hover:text-[color:var(--nx-danger)] transition-colors">
                                             @svg('heroicon-o-trash', 'w-3.5 h-3.5')
                                         </button>
                                     </div>
                                 </div>
 
                                 @if($log->content)
-                                    <p class="text-xs text-[color:var(--ui-secondary)] mt-1 whitespace-pre-line">{{ $log->content }}</p>
+                                    <p class="text-xs text-[color:var(--nx-text)] mt-1 whitespace-pre-line">{{ $log->content }}</p>
                                 @endif
 
-                                <div class="flex items-center gap-3 text-[10px] text-[color:var(--ui-secondary)] mt-2">
+                                <div class="flex items-center gap-3 text-[10px] text-[color:var(--nx-text)] mt-2">
                                     <span style="font-family: 'JetBrains Mono', monospace;">{{ $log->created_at->format('d.m.Y H:i') }}</span>
                                     @if($log->user)
                                         <span>{{ $log->user->name }}</span>
@@ -918,25 +918,25 @@
         {{-- ═══════════════════════════════════════════════════════════ --}}
         @elseif($activeTab === 'settings')
             <div class="max-w-2xl space-y-6">
-                <div class="rounded-xl border border-white/40 bg-white/60 backdrop-blur-sm p-6">
+                <div class="rounded-xl border border-white/40 bg-[color:var(--nx-surface)]/60 backdrop-blur-sm p-6">
                     <h3 class="text-sm font-semibold mb-4">Projekt-Details</h3>
 
                     <div class="space-y-4">
-                        <x-ui-input-text wire:model="form.name" label="Name" required />
-                        <x-ui-input-text wire:model="form.code" label="Code" placeholder="z.B. CP-001" />
-                        <x-ui-input-textarea wire:model="form.description" label="Beschreibung" rows="3" />
+                        <x-nx-input-text wire:model="form.name" label="Name" required />
+                        <x-nx-input-text wire:model="form.code" label="Code" placeholder="z.B. CP-001" />
+                        <x-nx-input-textarea wire:model="form.description" label="Beschreibung" rows="3" />
 
                         <div class="grid grid-cols-2 gap-4">
-                            <x-ui-input-select
+                            <x-nx-input-select
                                 name="form.status"
                                 wire:model="form.status"
                                 label="Status"
                                 :options="['draft' => 'Entwurf', 'active' => 'Aktiv', 'paused' => 'Pausiert', 'completed' => 'Abgeschlossen', 'cancelled' => 'Abgebrochen']"
                             />
-                            <x-ui-input-text wire:model="form.target_date" label="Zieldatum" type="date" />
+                            <x-nx-input-text wire:model="form.target_date" label="Zieldatum" type="date" />
                         </div>
 
-                        <x-ui-input-select
+                        <x-nx-input-select
                             name="form.owner_entity_id"
                             wire:model="form.owner_entity_id"
                             label="Owner (Organisation)"
@@ -945,26 +945,26 @@
                             nullLabel="Kein Owner"
                         />
 
-                        <x-ui-input-textarea wire:model="form.urgency_statement" label="Warum ist die Veränderung nötig?" rows="3" />
-                        <x-ui-input-textarea wire:model="form.vision_statement" label="Strategische Vision" rows="3" />
+                        <x-nx-input-textarea wire:model="form.urgency_statement" label="Warum ist die Veränderung nötig?" rows="3" />
+                        <x-nx-input-textarea wire:model="form.vision_statement" label="Strategische Vision" rows="3" />
                     </div>
 
                     @if($this->isDirty)
                         <div class="flex justify-end gap-2 mt-4 pt-4 border-t border-white/40">
-                            <x-ui-button variant="secondary" size="sm" wire:click="loadForm">Abbrechen</x-ui-button>
-                            <x-ui-button variant="primary" size="sm" wire:click="save">Speichern</x-ui-button>
+                            <x-nx-button variant="secondary" size="sm" wire:click="loadForm">Abbrechen</x-nx-button>
+                            <x-nx-button variant="primary" size="sm" wire:click="save">Speichern</x-nx-button>
                         </div>
                     @endif
                 </div>
 
                 {{-- Danger zone --}}
-                <div class="rounded-xl border border-[rgb(var(--ui-danger-rgb))]/20 bg-[rgb(var(--ui-danger-rgb))]/5 p-6">
-                    <h3 class="text-sm font-semibold text-[rgb(var(--ui-danger-rgb))] mb-2">Gefahrenzone</h3>
-                    <p class="text-xs text-[color:var(--ui-secondary)] mb-4">Das Löschen eines Projekts entfernt alle Phasen, Stakeholder, Maßnahmen und Log-Einträge.</p>
-                    <x-ui-button variant="danger" size="sm" wire:click="delete" wire:confirm="Projekt und alle zugehoerigen Daten wirklich löschen?">
+                <div class="rounded-xl border border-[color:var(--nx-danger)]/20 bg-[color:var(--nx-danger)]/5 p-6">
+                    <h3 class="text-sm font-semibold text-[color:var(--nx-danger)] mb-2">Gefahrenzone</h3>
+                    <p class="text-xs text-[color:var(--nx-text)] mb-4">Das Löschen eines Projekts entfernt alle Phasen, Stakeholder, Maßnahmen und Log-Einträge.</p>
+                    <x-nx-button variant="danger" size="sm" wire:click="delete" wire:confirm="Projekt und alle zugehoerigen Daten wirklich löschen?">
                         @svg('heroicon-o-trash', 'w-4 h-4')
                         Projekt löschen
-                    </x-ui-button>
+                    </x-nx-button>
                 </div>
             </div>
         @endif
@@ -976,25 +976,25 @@
     {{-- ═══════════════════════════════════════════════════════════ --}}
 
     {{-- Stakeholder Modal --}}
-    <x-ui-modal wire:model="stakeholderModalShow" :title="$editingStakeholderId ? 'Stakeholder bearbeiten' : 'Neuer Stakeholder'">
+    <x-nx-modal wire:model="stakeholderModalShow" :title="$editingStakeholderId ? 'Stakeholder bearbeiten' : 'Neuer Stakeholder'">
         <form wire:submit="storeStakeholder" class="space-y-4">
-            <x-ui-input-text wire:model="stakeholderForm.name" label="Name" required />
-            <x-ui-input-text wire:model="stakeholderForm.role" label="Rolle" />
+            <x-nx-input-text wire:model="stakeholderForm.name" label="Name" required />
+            <x-nx-input-text wire:model="stakeholderForm.role" label="Rolle" />
             <div class="grid grid-cols-2 gap-4">
-                <x-ui-input-select
+                <x-nx-input-select
                     name="stakeholderForm.influence_level"
                     wire:model="stakeholderForm.influence_level"
                     label="Einfluss"
                     :options="['low' => 'Niedrig', 'medium' => 'Mittel', 'high' => 'Hoch', 'critical' => 'Kritisch']"
                 />
-                <x-ui-input-select
+                <x-nx-input-select
                     name="stakeholderForm.support_level"
                     wire:model="stakeholderForm.support_level"
                     label="Unterstützung"
                     :options="['champion' => 'Champion', 'supporter' => 'Unterstützer', 'neutral' => 'Neutral', 'resistant' => 'Widerständig', 'blocker' => 'Blocker']"
                 />
             </div>
-            <x-ui-input-select
+            <x-nx-input-select
                 name="stakeholderForm.entity_id"
                 wire:model="stakeholderForm.entity_id"
                 label="Organisation (optional)"
@@ -1002,31 +1002,31 @@
                 :nullable="true"
                 nullLabel="Keine Zuordnung"
             />
-            <x-ui-input-textarea wire:model="stakeholderForm.notes" label="Notizen" rows="3" />
+            <x-nx-input-textarea wire:model="stakeholderForm.notes" label="Notizen" rows="3" />
 
             <div class="flex justify-end gap-2">
-                <x-ui-button variant="secondary" size="sm" wire:click="$set('stakeholderModalShow', false)" type="button">Abbrechen</x-ui-button>
-                <x-ui-button variant="primary" size="sm" type="submit">{{ $editingStakeholderId ? 'Speichern' : 'Erstellen' }}</x-ui-button>
+                <x-nx-button variant="secondary" size="sm" wire:click="$set('stakeholderModalShow', false)" type="button">Abbrechen</x-nx-button>
+                <x-nx-button variant="primary" size="sm" type="submit">{{ $editingStakeholderId ? 'Speichern' : 'Erstellen' }}</x-nx-button>
             </div>
         </form>
-    </x-ui-modal>
+    </x-nx-modal>
 
     {{-- Action Modal --}}
-    <x-ui-modal wire:model="actionModalShow" :title="$editingActionId ? 'Massnahme bearbeiten' : 'Neue Massnahme'">
+    <x-nx-modal wire:model="actionModalShow" :title="$editingActionId ? 'Massnahme bearbeiten' : 'Neue Massnahme'">
         <form wire:submit="storeAction" class="space-y-4">
-            <x-ui-input-text wire:model="actionForm.title" label="Titel" required />
-            <x-ui-input-textarea wire:model="actionForm.description" label="Beschreibung" rows="3" />
+            <x-nx-input-text wire:model="actionForm.title" label="Titel" required />
+            <x-nx-input-textarea wire:model="actionForm.description" label="Beschreibung" rows="3" />
             <div class="grid grid-cols-2 gap-4">
-                <x-ui-input-select
+                <x-nx-input-select
                     name="actionForm.status"
                     wire:model="actionForm.status"
                     label="Status"
                     :options="['open' => 'Offen', 'in_progress' => 'In Bearbeitung', 'done' => 'Erledigt', 'cancelled' => 'Abgebrochen']"
                 />
-                <x-ui-input-text wire:model="actionForm.due_date" label="Fällig am" type="date" />
+                <x-nx-input-text wire:model="actionForm.due_date" label="Fällig am" type="date" />
             </div>
-            <x-ui-input-text wire:model="actionForm.responsible" label="Verantwortlich" />
-            <x-ui-input-select
+            <x-nx-input-text wire:model="actionForm.responsible" label="Verantwortlich" />
+            <x-nx-input-select
                 name="actionForm.phase_id"
                 wire:model="actionForm.phase_id"
                 label="Phase (optional)"
@@ -1036,24 +1036,24 @@
             />
 
             <div class="flex justify-end gap-2">
-                <x-ui-button variant="secondary" size="sm" wire:click="$set('actionModalShow', false)" type="button">Abbrechen</x-ui-button>
-                <x-ui-button variant="primary" size="sm" type="submit">{{ $editingActionId ? 'Speichern' : 'Erstellen' }}</x-ui-button>
+                <x-nx-button variant="secondary" size="sm" wire:click="$set('actionModalShow', false)" type="button">Abbrechen</x-nx-button>
+                <x-nx-button variant="primary" size="sm" type="submit">{{ $editingActionId ? 'Speichern' : 'Erstellen' }}</x-nx-button>
             </div>
         </form>
-    </x-ui-modal>
+    </x-nx-modal>
 
     {{-- Log Modal --}}
-    <x-ui-modal wire:model="logModalShow" :title="$editingLogId ? 'Log-Eintrag bearbeiten' : 'Neuer Log-Eintrag'">
+    <x-nx-modal wire:model="logModalShow" :title="$editingLogId ? 'Log-Eintrag bearbeiten' : 'Neuer Log-Eintrag'">
         <form wire:submit="storeLog" class="space-y-4">
-            <x-ui-input-text wire:model="logForm.title" label="Titel" required />
-            <x-ui-input-select
+            <x-nx-input-text wire:model="logForm.title" label="Titel" required />
+            <x-nx-input-select
                 name="logForm.type"
                 wire:model="logForm.type"
                 label="Typ"
                 :options="['note' => 'Notiz', 'milestone' => 'Meilenstein', 'decision' => 'Entscheidung', 'risk' => 'Risiko', 'blocker' => 'Blocker']"
             />
-            <x-ui-input-textarea wire:model="logForm.content" label="Inhalt" rows="4" />
-            <x-ui-input-select
+            <x-nx-input-textarea wire:model="logForm.content" label="Inhalt" rows="4" />
+            <x-nx-input-select
                 name="logForm.phase_id"
                 wire:model="logForm.phase_id"
                 label="Phase (optional)"
@@ -1063,9 +1063,9 @@
             />
 
             <div class="flex justify-end gap-2">
-                <x-ui-button variant="secondary" size="sm" wire:click="$set('logModalShow', false)" type="button">Abbrechen</x-ui-button>
-                <x-ui-button variant="primary" size="sm" type="submit">{{ $editingLogId ? 'Speichern' : 'Erstellen' }}</x-ui-button>
+                <x-nx-button variant="secondary" size="sm" wire:click="$set('logModalShow', false)" type="button">Abbrechen</x-nx-button>
+                <x-nx-button variant="primary" size="sm" type="submit">{{ $editingLogId ? 'Speichern' : 'Erstellen' }}</x-nx-button>
             </div>
         </form>
-    </x-ui-modal>
+    </x-nx-modal>
 </x-ui-page>
