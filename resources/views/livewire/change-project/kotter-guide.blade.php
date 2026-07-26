@@ -11,7 +11,7 @@
         </x-ui-page-actionbar>
     </x-slot>
 
-    <x-ui-page-container>
+    <x-ui-page-container width="contained">
         <div class="max-w-4xl mx-auto space-y-12">
 
             {{-- Hero --}}

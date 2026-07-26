@@ -91,7 +91,7 @@
     </x-slot>
 
     {{-- Main content (default slot) --}}
-    <x-ui-page-container>
+    <x-ui-page-container width="contained">
         <div class="pt-6">
             @if($this->projects->isEmpty())
                 <div class="flex flex-col items-center justify-center py-16 text-center">
